@@ -1,0 +1,12 @@
+
+<zk>   
+    <window id="winApropos" title="A propos de" border="normal" 
+    width="460px" height="550px"  position="center" visible="true"
+    closable="true" action="show: slideIn({duration: 1000}); hide: slideUp({duration: 300})" 
+    xmlns:c="client"  >
+        <vbox width="100%">
+            <image id="image" src="/images/skin/apropos.png"  width="100%" height="350px"/>            
+        </vbox>
+    </window>
+<!--    onClose="self.visible = false; event.stopPropagation();"-->
+</zk>

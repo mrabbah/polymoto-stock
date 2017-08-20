@@ -1,0 +1,39 @@
+
+<window id="modalDialog" title="Générer document" border="normal" width="460px"
+        closable="true" action="show: slideDown;hide: slideUp" position="center,center">
+    <vlayout>
+        <checkbox id="l1" label="Avec arriere plan"  />
+        <checkbox id="l2" label="Avec cachet" />
+        <checkbox id="l3" label="Avec message copie" />
+        <checkbox id="l4" label="Avec destinataire" >
+            <attribute name="onCheck">
+         <![CDATA[
+         
+         if(l4.checked) {
+          fieldDestinataire.visible = true;
+          fieldDestinataire.constraint="no empty: Veillez indiquez une valeur";
+         }
+         else{
+         fieldDestinataire.visible = false;
+         fieldDestinataire.constraint="";
+         }
+         ]]>
+            </attribute>
+        </checkbox>
+        <textbox id="fieldDestinataire" hflex = "1" visible = 'false'/>
+           
+        <button hflex="1" label="Générer"> 
+            <attribute name="onClick">
+        <![CDATA[
+        session.setAttribute("AvecEntetepied",l1.checked );
+        session.setAttribute("AvecCachet",l2.checked );
+        session.setAttribute("AvecCopie",l3.checked );
+        session.setAttribute("AvecDestinataire",l4.checked );
+        session.setAttribute("Destinataire",fieldDestinataire.value );
+        modalDialog.detach();
+        
+        ]]>
+            </attribute>
+        </button>
+    </vlayout>
+</window>

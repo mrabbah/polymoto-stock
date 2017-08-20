@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Rapport_des_paiements" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.464100000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="389"/>
+	<parameter name="nomsociete" class="java.lang.String"/>
+	<parameter name="titrerapport" class="java.lang.String"/>
+	<parameter name="PaiementCreditSubReport" class="java.io.File"/>
+	<parameter name="PaiementDebitSubReport" class="java.io.File"/>
+	<parameter name="PaiementCredit" class="java.util.Collection"/>
+	<parameter name="PaiementDebit" class="java.util.Collection"/>
+	<parameter name="BCAchatSubReport" class="java.io.File"/>
+	<parameter name="BCVenteSubReport" class="java.io.File"/>
+	<parameter name="BCAchat" class="java.util.Collection"/>
+	<parameter name="BCVente" class="java.util.Collection"/>
+	<parameter name="TotalPD" class="java.lang.Double"/>
+	<parameter name="TotalPC" class="java.lang.Double"/>
+	<parameter name="TotalBCA" class="java.lang.Double"/>
+	<parameter name="TotalBCV" class="java.lang.Double"/>
+	<variable name="TotalPD" class="java.lang.Double" resetType="None" calculation="System"/>
+	<variable name="TotalPC" class="java.lang.Double" resetType="None" calculation="System"/>
+	<variable name="TotalBCAchat" class="java.lang.Double" calculation="System"/>
+	<variable name="TotalBCVente" class="java.lang.Double" calculation="System"/>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="72">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="-20" width="555" height="92" backcolor="#006699"/>
+				<textField>
+					<reportElement x="20" y="20" width="340" height="43" forecolor="#FFFFFF"/>
+					<textElement>
+						<font size="20" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{nomsociete}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="371" y="43" width="182" height="20" forecolor="#FFFFFF"/>
+					<textElement textAlignment="Right">
+						<font size="12" isBold="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{titrerapport}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<detail>
+		<band height="449">
+			<subreport>
+				<reportElement positionType="Float" x="0" y="22" width="555" height="100"/>
+				<subreportParameter name="titre">
+					<subreportParameterExpression><![CDATA["débit"]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{PaiementDebit})]]></dataSourceExpression>
+				<returnValue subreportVariable="TMontantpaye" toVariable="TotalPD"/>
+				<subreportExpression class="java.io.File"><![CDATA[$P{PaiementDebitSubReport}]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="232" width="555" height="100"/>
+				<subreportParameter name="titre">
+					<subreportParameterExpression><![CDATA["ventes"]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{BCVente})]]></dataSourceExpression>
+				<returnValue subreportVariable="TotalTTC" toVariable="TotalBCVente"/>
+				<subreportExpression class="java.io.File"><![CDATA[$P{BCVenteSubReport}]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="127" width="555" height="100" isPrintWhenDetailOverflows="true"/>
+				<subreportParameter name="titre">
+					<subreportParameterExpression><![CDATA["crédit"]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{PaiementCredit})]]></dataSourceExpression>
+				<returnValue subreportVariable="TMontantpaye" toVariable="TotalPC"/>
+				<subreportExpression class="java.io.File"><![CDATA[$P{PaiementDebitSubReport}]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement positionType="Float" x="0" y="337" width="555" height="100"/>
+				<subreportParameter name="titre">
+					<subreportParameterExpression><![CDATA["achats"]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{BCAchat})]]></dataSourceExpression>
+				<returnValue subreportVariable="TotalTTC" toVariable="TotalBCAchat"/>
+				<subreportExpression class="java.io.File"><![CDATA[$P{BCVenteSubReport}]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="14">
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="515" height="13" backcolor="#E6E6E6"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement mode="Opaque" x="515" y="0" width="40" height="13" backcolor="#E6E6E6"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="0" width="100" height="13"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="30">
+			<textField evaluationTime="Report" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="150" y="10" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{TotalPD} - $P{TotalPC}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="455" y="10" width="100" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{TotalBCV} - $P{TotalBCA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="10" width="150" height="20"/>
+				<textElement>
+					<font size="10" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Différence débit crédit ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="305" y="10" width="150" height="20"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Différence ventes achats ]]></text>
+			</staticText>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>

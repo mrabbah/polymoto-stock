@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./bonLivraisonWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="bonLivraisonWin" height="100%" width="100%" style="margin:auto;" use="${bonLivraisonWindow}">
+        <zscript>
+        <![CDATA[
+              String imgPath = "/images/skin";
+              boolean afficherNumPartenaire = false;
+              String s_partenaire = "client";
+              String uper_s_partenaire = "Client";
+              String abreviation = "BL";
+              String operation = "livraison";
+              if(bonLivraisonWin.type.equals("VENTE")) {
+                if(bonLivraisonWin.estBonRetour) {
+                    s_partenaire = "client";
+                    operation = "retour";
+                    abreviation = "BR";
+                    afficherNumPartenaire = true;
+                } else {
+                    s_partenaire = "fournisseur";
+                    abreviation = "BL";
+                    afficherNumPartenaire = false;
+                }
+              } else {                  
+                  uper_s_partenaire = "Fournisseur";
+                  if(bonLivraisonWin.estBonRetour) {
+                      s_partenaire = "fournisseur";
+                      operation = "retour";
+                      abreviation = "BR";
+                      afficherNumPartenaire = false;
+                  } else {
+                      s_partenaire = "client";
+                      abreviation = "BL";
+                      afficherNumPartenaire = true;
+                  }
+              }
+        ]]>
+        </zscript>
+        <borderlayout>
+            <west id="westPanel" size="100%" flex="true" collapsible="true" open="false">
+                <borderlayout>
+                    <center border="none">
+                        <vlayout>
+                            <box pack="start" align="start" width="100%" height="100%">
+                                <hlayout height="530px" style="padding:10px" width="100%"> 
+                                    <listbox id="lstligneProduitsBc" multiple="true" vflex="true" model="@{bonLivraisonWin.sortedLigneProduitsBc}" selectedItem="@{bonLivraisonWin.ligneProduitsSelectedBc, converter=com.choranet.zk.SelectedItemsConverterV3}" rows="20" sizedByContent="true" span="true"  width="575px" height="100%">
+                                        <auxhead>
+                                            <auxheader colspan="4">
+                                                <hbox>
+                                                    <label id="commandebase" value="Bon (Commande / Prêt)" style="font-weight:bold;color:green;" />
+                                                    <space spacing="20px" />
+                                                    <combobox id="cobonCommandes" readonly="false"  model="@{bonLivraisonWin.bonCommandes}" selectedItem="@{bonLivraisonWin.bonCommandeSelected}">
+                                                        <attribute name="onSelect">
+                                                                    <![CDATA[
+                                                                        self.disabled = true;
+                                                                        bonLivraisonWin.commandeChoisie();
+                                                                        if (bonLivraisonWin.bonCommandeSelected.toString().contains("BC")){
+                                                                           commandebase.value = "Bon Commande"; 
+                                                                        }else 
+                                                                           commandebase.value = "Bon Prêt"; 
+                                                                    ]]>
+                                                        </attribute>
+                                                        <comboitem self="@{each=elementbonCommande}" label="@{elementbonCommande}"/>
+                                                    </combobox>                                                    
+                                                </hbox>
+                                            </auxheader>
+                                        </auxhead>
+                                        <listhead sizable="true">
+                                            <listheader label="Code" width="90px"/>
+                                            <listheader label="Libelle" width="170px"/>
+                                            <listheader label="Quantité" if="${bonLivraisonWin.estBonRetour == false}"/>	
+                                            <listheader label="Quantité livrée"/>	
+                                            <listheader label="Quantité retournée" if="${bonLivraisonWin.estBonRetour == true}"/>	
+                                        </listhead>
+                                        <listitem self="@{each=elementlp}" value="@{elementlp}">
+                                            <listcell>
+                                                <textbox value="@{elementlp.produit.code}" inplace="true" readonly="true"/>
+                                            </listcell>
+                                            <listcell>
+                                               <textbox value="@{elementlp.produit.designation}" inplace="true" readonly="true" width="99%"/> 
+                                            </listcell>
+                                            <listcell label="@{elementlp.quantite}" if="${bonLivraisonWin.estBonRetour == false}"/>
+                                            <listcell label="@{elementlp.quantiteLivree}"/>
+                                            <listcell label="@{elementlp.quantiteRetournee}" if="${bonLivraisonWin.estBonRetour == true}"/>
+                                        </listitem>
+                                    </listbox>
+                                    <vbox spacing="10px"> 
+                                        <image style="cursor:pointer" src="${imgPath}/rightrightarrow_g.png" onClick="bonLivraisonWin.choisirTout()"/>
+                                        <image style="cursor:pointer" src="${imgPath}/rightarrow_g.png" onClick="bonLivraisonWin.choisirDesElements()"/>
+                                        <image style="cursor:pointer" src="${imgPath}/leftarrow_g.png" onClick="bonLivraisonWin.enleverDesElements()"/>
+                                        <image style="cursor:pointer" src="${imgPath}/leftleftarrow_g.png" onClick="bonLivraisonWin.enleverTout()"/>
+                                    </vbox>
+                                    <listbox id="lstligneProduitsBl" multiple="true" vflex="true" model="@{bonLivraisonWin.sortedLigneProduitsBl}" selectedItem="@{bonLivraisonWin.ligneProduitsSelectedBl, converter=com.choranet.zk.SelectedItemsConverterV3}" rows="20" sizedByContent="true" span="true"  width="575px" height="100%">
+                                        <auxhead>
+                                            <auxheader colspan="4">
+                                                <hlayout height="21px">
+                                                    <label value="N° :" style="font-weight:bold;"/>
+                                                    <space spacing="20px" />
+                                                    <textbox id="fieldNumBL" style="font-weight:bold;" disabled="true" width="99%" value="@{bonLivraisonWin.objet.numBL, save-when='triggerBtn.onClick'}" />
+                                                    <space bar="true" spacing="20px" />
+                                                    <label value="N° ${s_partenaire}" style="font-weight:bold;" if="${afficherNumPartenaire}"/>
+                                                    <space spacing="20px" if="${afficherNumPartenaire}"/>
+                                                    <textbox if="${afficherNumPartenaire}" id="fieldNumBLFss" style="font-weight:bold;" width="99%" value="@{bonLivraisonWin.objet.reference, save-when='triggerBtn.onClick'}" />
+                                                    <space bar="true" spacing="20px" if="${afficherNumPartenaire}"/>
+                                                    <label value="Date" style="font-weight:bold;"/>
+                                                    <space spacing="20px" />
+                                                    <datebox id="fieldDate" width="100px" constraint="no empty: Veillez indiquez une valeur" format="dd/MM/yyyy" value="@{bonLivraisonWin.objet.date, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");'/>                                        
+                                                </hlayout>
+                                            </auxheader>                                                         
+                                        </auxhead>
+                                        <listhead sizable="true">
+<!--                                            <listheader label="Code" width="90px"/>-->
+                                            <listheader label="Libelle" width="170px"/>
+                                            <listheader label="Quantité" if="${bonLivraisonWin.estBonRetour == false}"/>	
+                                            <listheader label="Quantité à livrer" if="${bonLivraisonWin.estBonRetour == false}"/>
+                                            <listheader label="Quantité livrée" if="${bonLivraisonWin.estBonRetour == true}"/>
+                                            <listheader label="Quantité à retourner" if="${bonLivraisonWin.estBonRetour == true}"/>
+                                            <listheader label="Entrepôt" width="80px" if="${bonLivraisonWin.multiEntrepot == true}"/>
+                                            <listheader label="DLC" width="90px" if="${bonLivraisonWin.produitPerissableManaged == true}"/>
+                                        </listhead>
+                                        <listitem self="@{each=elementlpbis}" value="@{elementlpbis}">
+<!--                                            <listcell label="@{elementlpbis.produit.code}"/>-->
+                                            <listcell label="@{elementlpbis.produit.designation}"/>
+                                            <listcell label="@{elementlpbis.quantite}" if="${bonLivraisonWin.estBonRetour == false}"/>
+                                            <listcell if="${bonLivraisonWin.estBonRetour == false}">
+                                                <doublebox id="@{elementlpbis.produit.code}" value="@{elementlpbis.quantiteLivree, save-when='triggerBtn.onClick'}" constraint="${c:new('com.choranet.zk.LigneProduitLivreContrainte')}" inplace="true"  width="99%"/>
+                                            </listcell>
+                                            <listcell label="@{elementlpbis.quantiteLivree}" if="${bonLivraisonWin.estBonRetour == true}"/>
+                                            <listcell if="${bonLivraisonWin.estBonRetour == true}">
+                                                <doublebox value="@{elementlpbis.quantiteRetournee, save-when='triggerBtn.onClick'}" constraint="${c:new('com.choranet.zk.LigneProduitLivreContrainte')}" inplace="true"  width="99%"/>
+                                            </listcell>  
+                                            <listcell if="${bonLivraisonWin.multiEntrepot == true}">
+<!--                                                <textbox value="@{elementlpbis.entrepot, save-when='triggerBtn.onClick'}" inplace="true" width="99%"/>-->
+                                                <combobox readonly="true" onSelect="bonLivraisonWin.actualiserEntrepotPourLigneProduitBL(self.parent.parent.value)" model="@{bonLivraisonWin.emplacementLivraisons}" selectedItem="@{elementlpbis.entrepot}" inplace="true" width="99%">
+                                                    <comboitem self="@{each=elemententrepot}" label="@{elemententrepot}"/>
+                                                </combobox>
+                                            </listcell>
+                                            <listcell if="${bonLivraisonWin.produitPerissableManaged == true}">
+                                                <datebox  format="dd/MM/yyyy" value="@{elementlpbis.date_preremption, save-when='triggerBtn.onClick'}" constraint="no empty: Veillez indiquez une valeur" width="99%"/>
+                                            </listcell>
+                                        </listitem>
+                                                
+<!--                                        <listfoot>
+                                            <listfooter/>
+                                            <listfooter/>
+                                            <listfooter/>
+                                            <listfooter height="15px">
+                                                <label visible="false" id="footer" value="Livraison Expresse" style="font-weight:bold;color:red;"/>
+                                            </listfooter>
+                                        </listfoot>-->
+                                    </listbox>
+                                </hlayout>
+                            </box>
+                        </vlayout>
+                    </center>
+                    <south size="50px" border="none">
+                        <hbox>
+                            <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));bonLivraisonWin.add()" label="Sauveguarder" image="/images/skin/database_save.png" visible="false"/>
+                            <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));bonLivraisonWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                            <button id="btnDocument" label="Imprimer" image="/images/skin/printer_small.png" visible="false" onClick="bonLivraisonWin.doModalDialogChoix()" />
+                            <button id="btnDelete" label="Supprimer" image="/images/skin/database_delete.png" visible="false">
+                                <attribute name="onClick">
+                                    <![CDATA[
+                                    Messagebox.show("Etes vous sûr de vouloir continuer ?", "Confirmation", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+                                        public void onEvent(Event evt) throws InterruptedException {
+                                            if (evt.getName().equals("onOK")) {
+                                                Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));
+                                                bonLivraisonWin.delete();
+                                            } 
+                                        }
+                                    });
+                                    ]]>
+                                </attribute>    
+                            </button>
+                            <button id="btnCancel" onClick="bonLivraisonWin.cancel();" label="Annuler" image="/images/skin/cancel.png" />
+                            <button id="btnList" onClick="bonLivraisonWin.fermer();" label="Retour à la liste" image="/images/skin/database_table.png" />
+                            <button id="btnLivraison" onClick="bonLivraisonWin.infosLivraison();" label="Informations livraison" image="/images/skin/ArrowsUpDown-16x16.png" visible="false" />
+                            <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                        </hbox>
+                    </south>
+                </borderlayout>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" model="@{bonLivraisonWin.listeObjets}" selectedItem="@{bonLivraisonWin.objetSelected}"  width="100%" height="520px" mold="paging" paginal="${paging}">
+                        <attribute name="onSelect">
+                            <![CDATA[
+                                bonLivraisonWin.select();
+                                if(bonLivraisonWin.bonCommandeSelected != null){
+                                    if(bonLivraisonWin.bonCommandeSelected.toString().contains("BC")){
+                                        commandebase.value = "Bon Commande"; 
+                                    }else 
+                                        commandebase.value = "Bon Prêt"; 
+                                }                                                                
+                            ]]>
+                        </attribute>
+                        <auxhead sclass="category-center">
+                            <auxheader colspan="1"/>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumBL" value="@{bonLivraisonWin.filtre.numBL}" onChanging="bonLivraisonWin.ofs; bonLivraisonWin.filtre.numBL=event.value; bonLivraisonWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="90%"/>
+                            </auxheader>
+                            <auxheader colspan="1" if="${afficherNumPartenaire}">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterreference" value="@{bonLivraisonWin.filtre.reference}" onChanging="bonLivraisonWin.ofs; bonLivraisonWin.filtre.reference=event.value; bonLivraisonWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="90%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <combobox id="filterbonCommande" model="@{bonLivraisonWin.bonCommandesFilter}" selectedItem="@{bonLivraisonWin.filtre.bonCommande}" autocomplete="true" autodrop="true" mold="rounded" onSelect="bonLivraisonWin.ofs=0;bonLivraisonWin.filtrer()" onOK="bonLivraisonWin.ofs=0;bonLivraisonWin.filtrer()" width="90%">
+                                    <comboitem self="@{each=elementfiltrebonCommande}" label="@{elementfiltrebonCommande}"/>
+                                </combobox>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDate" format="dd/MM/yyyy" value="@{bonLivraisonWin.filtre.date}" onOK="bonLivraisonWin.ofs=0; bonLivraisonWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+                            <auxheader colspan="1" />
+                        </auxhead>
+                        <listhead sizable="true">
+                            <listheader width="32px" />
+                            <listheader label="N° ${abreviation}" sort="auto(numBL)" onSort="bonLivraisonWin.sort(event)"/>	
+                            <listheader if="${afficherNumPartenaire}" label="Reférence ${abreviation}" sort="auto(reference)" onSort="bonLivraisonWin.sort(event)"/>
+                            <listheader label="N° BC / BP client" sort="auto(bonCommande.numBC)" onSort="bonLivraisonWin.sort(event)"/>	
+                            <listheader label="Date" sort="auto(date)" onSort="bonLivraisonWin.sort(event)"/>	
+                            <listheader label="N° livraison"/>	
+                        </listhead>
+                        <listitem value="@{element}" self="@{each=element}">    
+                            <listcell image="/images/skin/icon_selection.png"/>
+                            <listcell label="@{element.numBL}"/>
+                            <listcell label="@{element.reference}" if="${afficherNumPartenaire}"/>
+                            <listcell label="@{element.bonCommande.numBC}"/>
+                            <listcell>
+                                <datebox format="dd/MM/yyyy" value="@{element.date, save-when='self.onChange'}" inplace="true" onOK="bonLivraisonWin.objet=self.parent.parent.value; bonLivraisonWin.update();" onChange='self.style="font-weight:bold"' width="99%"/>
+                            </listcell>							
+                            <listcell label="@{element.livraison}"/>
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{bonLivraisonWin.tailleListe}" pageSize="@{bonLivraisonWin.maxNb}" onPaging="bonLivraisonWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="bonLivraisonWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="bonLivraisonWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="bonLivraisonWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+        <window id="modalDialogChoix" title="Générer document" border="normal" width="460px"
+                closable="true" action="show: slideDown;hide: slideUp" position="center,center" visible = "false" onClose="self.visible = false; event.stopPropagation();">
+            <vlayout>
+                <div>
+                    <radiogroup id="sv1" />
+                    <radio id="rdefaut" label="Par défaut" radiogroup="sv1" />
+                    <radio id="ravecEntetepied" label="Avec entête et pied" radiogroup="sv1" />
+                    <radio id="rsansEntetepied" label="Sans entête et pied" radiogroup="sv1" />
+                </div>
+                <separator/>
+                <checkbox id="AvecCachet" label="Avec cachet" />
+                <checkbox id="AvecCopie" label="Avec message copie" />
+                <checkbox id="AvecDestinataire" label="Avec destinataire" value=" " >
+                    <attribute name="onCheck">
+                        <![CDATA[
+                        if(AvecDestinataire.checked) {
+                        fieldDestinataire.visible = true;
+                        }
+                        else{
+                        fieldDestinataire.visible = false;
+                        fieldDestinataire.constraint="";
+                        }
+                        ]]>
+                    </attribute>
+                </checkbox>
+                <textbox id="fieldDestinataire" hflex = "1" visible = 'false'/>
+                <button hflex="1" label="Générer" onClick='bonLivraisonWin.genererDocument(rdefaut.selected,ravecEntetepied.selected,rsansEntetepied.selected, AvecCachet.checked, AvecCopie.checked, AvecDestinataire.checked, fieldDestinataire.value)'/> 
+            </vlayout>
+        </window>        
+    </window>
+</zk>

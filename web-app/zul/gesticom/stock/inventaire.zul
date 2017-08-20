@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./inventaireWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+        
+    <window id="inventaireWin" height="100%" width="100%" style="margin:auto;" use="${inventaireWindow}">
+        <borderlayout>
+            <west id="westPanel" title="CRUD" size="100%" flex="true" splittable="true" collapsible="true" open="false" border="none">
+                <borderlayout>
+                    <west size="200px" flex="true" border="none">
+                        <vbox height="100%">
+                            <separator />
+                            <groupbox  height="100%">
+                                <grid fixedLayout="true" span="true" sizedByContent="true">
+                                    <rows>                                        
+                                        <row>
+                                            <label value="Entrepôt" />
+                                        </row>
+                                        <row>
+                                            <combobox id="coentrepots" autodrop="true"  constraint="no empty:Veuillez choisir un client" model="@{inventaireWin.entrepots}" selectedItem="@{inventaireWin.entrepotSelected}" width="99%">
+                                                <attribute name="onChanging">
+                                                    <![CDATA[
+                                                        if(gridAjout.visible == false) {
+                                                            gridAjout.visible = true;
+                                                        }
+                                                    ]]>
+                                                </attribute>
+                                                <attribute name="onSelect">
+                                                    <![CDATA[
+                                                        if(gridAjout.visible == false) {
+                                                            gridAjout.visible = true;
+                                                        }
+                                                        coentrepots.disabled = true;
+                                                        btnSave.visible = true;
+                                                    ]]>
+                                                </attribute>
+                                                <attribute name="onOK">
+                                                    <![CDATA[
+                                                        if(gridAjout.visible == false) {
+                                                            gridAjout.visible = true;
+                                                        }                                                        
+                                                        coentrepots.disabled = true;
+                                                        btnSave.visible = true;
+                                                    ]]>
+                                                </attribute>
+                                                <comboitem self="@{each=elemententrepot}" label="@{elemententrepot}"/>
+                                            </combobox>
+                                        </row>
+                                        <row>
+                                            <label value="Date inventaire"/>
+                                        </row>
+                                        <row>
+                                            <datebox id="fieldDate" constraint="no empty:Veuillez indiquez la date de l'inventaire" format="dd/MM/yyyy" value="@{inventaireWin.objet.dateDebut, save-when='triggerBtn.onClick'}" width="99%"/>
+                                        </row>
+                                        <row>
+                                            <label value="Détails"/>
+                                        </row>
+                                        <row>
+                                            <textbox id="fieldDetail" value="@{inventaireWin.objet.details, save-when='triggerBtn.onClick'}" multiline="true" rows="5" width="99%"/>
+                                        </row>
+                                    </rows>
+                                </grid>
+                            </groupbox>                            
+                        </vbox>
+                    </west>
+                    <center border="none">
+                        <groupbox height="100%">
+                            <tabbox height="540px">
+                                <tabs>
+                                    <tab label="Lignes inventaires" />
+                                </tabs>
+                                <tabpanels>
+                                    <tabpanel>
+                                        <vbox width="100%">
+                                            <listbox id="lstligneInventaires" model="@{inventaireWin.objet.ligneInventaires}"  height="450" rows="11" span="true">
+                                                <listhead sizable="true">
+                                                    <listheader width="20px"/>
+                                                    <listheader label="Produit" width="312px"/>	
+                                                    <listheader label="Date préremption" width="60px" if="${inventaireWin.produitPerissableManaged == true}"/>
+                                                    <listheader label="Quantité comptée" width="60px"/>	
+                                                    <listheader label="Quantité système" width="60px"/>	
+                                                </listhead>
+                                                <listitem value="@{lignepdt}" self="@{each=lignepdt}">    
+                                                    <listcell image="/images/skin/database_delete.png" onClick="inventaireWin.deleteLigneInventaire(self.parent.value)" style="@{lignepdt.trans_style}"/>                                                    							                                                    	 
+<!--                                                    <listcell label="@{lignepdt.produit}" style="@{lignepdt.trans_style}"/>-->
+                                                    <listcell >
+                                                        <textbox value="@{lignepdt}" hflex="1" readonly="true"  inplace="true" style="@{lignepdt.trans_style}" width="99%"/>
+                                                    </listcell>
+                                                    <listcell if="${inventaireWin.produitPerissableManaged == true}">
+                                                        <datebox format="dd/MM/yyyy" value="@{lignepdt.date_preremption, save-when='triggerBtn.onClick'}" width="99%"/>
+                                                    </listcell>
+                                                    <listcell>
+                                                        <doublebox format="#,##0.##" value="@{lignepdt.quantiteInv, save-when='self.onChange'}" constraint="no negative,no empty:Veuillez indiquez une valeur positive" inplace="true" onChange='self.style="font-weight:bold";' onOK='self.style="font-weight:bold";' width="99%" style="@{lignepdt.trans_style}"/>
+                                                    </listcell>
+                                                    <listcell label="@{lignepdt.qantiteActuele, converter='com.choranet.zk.DoubleConverter'}" style="@{lignepdt.trans_style}"/>
+                                                </listitem>
+                                            </listbox>
+                                            <separator/>
+                                            <grid id="gridAjout" span="true" sizedByContent="true" visible="false">
+                                                <columns>
+                                                    <column width="20px" />
+                                                    <column width="312px" />
+                                                    <column width="60px" if="${inventaireWin.produitPerissableManaged == true}"/>
+                                                    <column width="60px" />
+                                                    <column width="60px"/>
+                                                    <column width="8px"/>
+                                                </columns>
+                                                <rows>
+                                                    <row>
+                                                        <image src="/images/skin/database_edit.png"  />
+                                                        <combobox id="conewproduits" constraint="no empty : Veuillez choisir un produit" model="@{inventaireWin.produits}" selectedItem="@{inventaireWin.ligneInventaire.produit}" onChange='inventaireWin.changementProduit()' inplace="true" width="99%">
+                                                            <comboitem self="@{each=elementnewproduit}" label="@{elementnewproduit}"/>
+                                                        </combobox>
+                                                        <datebox id="fielddlcbis" if="${inventaireWin.produitPerissableManaged == true}" format="dd/MM/yyyy" value="@{inventaireWin.ligneInventaire.date_preremption, save-when='self.onChange'}" width="99%" onChange='inventaireWin.changementDlcProduit(self.value)'/>
+                                                        <doublebox id="fieldquantiteinventairebis" format="#,##0.##" constraint="no negative,no empty:Veuillez indiquez une valeur positive" value="@{inventaireWin.ligneInventaire.quantiteInv, save-when='self.onChange'}" onOK="inventaireWin.addLigneInventaire();conewproduits.focus();" inplace="true" width="99%" />                                                                             
+                                                        <label id="fieldquantitebis" value="@{inventaireWin.ligneInventaire.qantiteActuele, save-when='self.onChange', converter='com.choranet.zk.DoubleConverter'}" width="99%" />                     
+                                                        <label if="${inventaireWin.produitPerissableManaged == true}"/>
+                                                    </row>
+                                                </rows>
+                                            </grid>
+                                        </vbox>
+                                    </tabpanel>
+                                </tabpanels>
+                            </tabbox>
+                            <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));inventaireWin.add()" label="Sauveguarder" image="/images/skin/database_save.png" visible="false"/>
+                            <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));inventaireWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                            <button id="btnSuspendre" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));inventaireWin.suspendre()" label="Suspendre" image="/images/skin/exclamation.png" visible="false"/>
+                            <button id="btnReprendre" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));inventaireWin.reprendre()" label="Reprendre" image="/images/skin/database_table.png" visible="false"/>
+                            <button id="btnAcheve" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));inventaireWin.achever()" label="Achevé" image="/images/skin/funnel.png" visible="false"/>
+                            <button id="btnValider" label="Validé" image="/images/skin/DisketteBlack-16x16.png" visible="false">
+                                <attribute name="onClick">
+                                    <![CDATA[
+                                        Messagebox.show("Cette opération va actualiser l'état actuelle de l'entrepôt " + inventaireWin.objet.entrepot + ", Êtes vous sûr de vouloir continuer?",
+                                                        "Confirmation", Messagebox.OK | Messagebox.CANCEL,Messagebox.QUESTION,
+                                                        new org.zkoss.zk.ui.event.EventListener(){
+                                                            public void onEvent(Event e){
+                                                                if("onOK".equals(e.getName())){
+                                                                    inventaireWin.valider();
+                                                                }
+                                                            }
+                                                        }
+                                                        );
+                                    ]]>
+                                </attribute>
+                            </button>
+<!--                            <button id="btnDocument" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));inventaireWin.genererDocument()" label="Générer docuement" image="/images/skin/pdf-soubor-logo.png" visible="false"/>-->
+                            <button id="btnDelete" label="Supprimer" image="/images/skin/database_delete.png" visible="false">
+                                <attribute name="onClick">
+                                    <![CDATA[
+                                    Messagebox.show("Etes vous sûr de vouloir continuer ?", "Confirmation", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+                                        public void onEvent(Event evt) throws InterruptedException {
+                                            if (evt.getName().equals("onOK")) {
+                                                Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));
+                                                inventaireWin.delete();
+                                            } 
+                                        }
+                                    });
+                                    ]]>
+                                </attribute>    
+                            </button>
+                    <!-- <button id="btnNew" onClick="inventaireWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                            <button id="btnCancel" onClick="inventaireWin.cancel()" label="Annuler" image="/images/skin/cancel.png" />
+                            <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                        </groupbox>
+                    </center>
+                </borderlayout>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="inventaireWin.select()" model="@{inventaireWin.listeObjets}" selectedItem="@{inventaireWin.objetSelected}"  width="100%" height="520px" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+                            <auxheader colspan="1"/>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+<!--                                <combobox id="filterentrepot" model="@{inventaireWin.entrepotsfilter}" selectedItem="@{inventaireWin.filtre.entrepot}" autocomplete="true" autodrop="true" mold="rounded" onSelect="inventaireWin.ofs=0;inventaireWin.filtrer()" onOK="inventaireWin.ofs=0;inventaireWin.filtrer()" width="90%">
+                                    <comboitem self="@{each=elementfiltreentrepot}" label="@{elementfiltreentrepot}"/>
+                                </combobox>-->
+                            </auxheader>                           
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDateDebut" format="dd/MM/yyyy" value="@{inventaireWin.filtre.dateDebut}" onOK="inventaireWin.ofs=0; inventaireWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDateFin" format="dd/MM/yyyy" value="@{inventaireWin.filtre.dateFin}" onOK="inventaireWin.ofs=0; inventaireWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader> 
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <combobox id="filteretat" readonly="true" selectedItem="@{inventaireWin.filtre.etat}" autocomplete="true" autodrop="true" mold="rounded" onSelect="inventaireWin.ofs=0;inventaireWin.filtrer()" onOK="inventaireWin.ofs=0;inventaireWin.filtrer()" width="90%">
+                                    <comboitem value="EN COURS" label="En cours"/>
+                                    <comboitem value="SUSPENDU" label="Suspendu"/>
+                                    <comboitem value="ACHEVE" label="Achevé"/>
+                                    <comboitem value="VALIDE" label="Validé"/>
+                                </combobox>
+                            </auxheader> 
+                        </auxhead>
+                        <listhead sizable="true">
+                            <listheader width="32px" />
+                            <listheader label="Entrepôt" sort="auto(entrepot.code)" onSort="inventaireWin.sort(event)"/>	
+                            <listheader label="Date Début" sort="auto(dateDebut)" onSort="inventaireWin.sort(event)"/>	
+                            <listheader label="Date fin" sort="auto(dateFin)" onSort="inventaireWin.sort(event)"/>	
+                            <listheader label="Etat" sort="auto(etat)" onSort="inventaireWin.sort(event)"/>	
+                        </listhead>
+                        <listitem value="@{element}" self="@{each=element}">    
+                            <listcell image="/images/skin/icon_selection.png"/>
+                            <listcell label="@{element.entrepot}" />
+                            <listcell>
+                                <datebox format="dd/MM/yyyy" value="@{element.dateDebut, save-when='self.onChange'}" inplace="true" onOK="inventaireWin.objet=self.parent.parent.value; inventaireWin.update();" onChange='self.style="font-weight:bold"' width="99%"/>
+                            </listcell>							
+                            <listcell>
+                                <datebox format="dd/MM/yyyy" value="@{element.dateFin, save-when='self.onChange'}" inplace="true" onOK="inventaireWin.objet=self.parent.parent.value; inventaireWin.update();" onChange='self.style="font-weight:bold"' width="99%"/>
+                            </listcell>
+                            <listcell label="@{element.etat, converter='com.choranet.zk.EtatInventaireConverter'}" />
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{inventaireWin.tailleListe}" pageSize="@{inventaireWin.maxNb}" onPaging="inventaireWin.getNextElements(event);" />
+                    
+                    <separator/>
+                    <button id="btnNew" onClick="inventaireWin.newRecord();" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnInventaireDetails" onClick="inventaireWin.genererInvenraireDetails();" label="Détails" image="/images/skin/printer_small.png"/>
+<!--                    <button id="btnPdf" onClick="inventaireWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="inventaireWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>-->
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

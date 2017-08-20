@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./entrepotWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="entrepotWin" height="100%" width="100%" style="margin:auto;" use="${entrepotWindow}">
+    <!-- <zscript src="/zs/entrepot.zs"/> -->
+        <borderlayout>
+            
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="entrepotWin.select()" model="@{entrepotWin.listeObjets}" selectedItem="@{entrepotWin.objetSelected}"  width="100%" height="520px" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+                            <auxheader colspan="1"/>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterCode" value="@{entrepotWin.filtre.code}" onChanging="entrepotWin.ofs = 0; entrepotWin.filtre.code=event.value; entrepotWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterIntitule" value="@{entrepotWin.filtre.intitule}" onChanging="entrepotWin.ofs = 0; entrepotWin.filtre.intitule=event.value; entrepotWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            <auxheader colspan="1"/>
+                        </auxhead>
+                        <listhead sizable="true">
+                            <listheader width="32px" />
+                            <listheader label="Code" sort="auto(code)" onSort="entrepotWin.sort(event)"/>	
+                            <listheader label="Intitule" sort="auto(intitule)" onSort="entrepotWin.sort(event)"/>	
+                            <listheader width="32px" />
+                        </listhead>
+                        <listitem value="@{element}" self="@{each=element}">    
+                            <listcell image="/images/skin/icon_selection.png"/>
+                            <listcell>
+                                <textbox value="@{element.code, save-when='self.onChange'}" inplace="true" onOK="entrepotWin.objet=self.parent.parent.value; entrepotWin.update();" onChange='self.style="font-weight:bold"' width="99%"/>
+                            </listcell>							
+                            <listcell>
+                                <textbox value="@{element.intitule, save-when='self.onChange'}" inplace="true" onOK="entrepotWin.objet=self.parent.parent.value; entrepotWin.update();" onChange='self.style="font-weight:bold"' width="99%"/>
+                            </listcell>							
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{entrepotWin.tailleListe}" pageSize="@{entrepotWin.maxNb}" onPaging="entrepotWin.getNextElements(event);" />
+                    <separator/>
+                    <grid>
+                        <columns>
+                            <column width="32px" />			
+                            <column />
+                            <column />
+                            <column width="32px" />			
+                        </columns>
+                        <rows>
+                            <row>
+                                <image src="/images/skin/database_edit.png">
+                                    <attribute name="onClick">
+                                        <![CDATA[
+                                            entrepotWin.objet = com.choranet.gesticom.Entrepot.class.newInstance();
+                                            entrepotWin.rafraichirField();
+                                            entrepotWin.rafraichirList();
+                                            entrepotWin.isUpdate = false;
+                                            entrepotWin.afficherValeurAssociation();
+                                        ]]>
+                                    </attribute>
+                                </image>
+                                
+                                <textbox id="fieldCode" inplace="true"  constraint="no empty: Veillez indiquez une valeur" value="@{entrepotWin.objet.code, save-when='self.onChange'}" onOK="entrepotWin.addOrUpdate();" width="99%"/>
+
+                                <textbox id="fieldIntitule" inplace="true"  constraint="no empty: Veillez indiquez une valeur" value="@{entrepotWin.objet.intitule, save-when='self.onChange'}" onOK="entrepotWin.addOrUpdate();" width="99%"/>
+                                
+                                <label/>
+                            </row>												
+                        </rows>
+                    </grid>
+                    <separator/>
+                    <button id="btnPdf" onClick="entrepotWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="entrepotWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

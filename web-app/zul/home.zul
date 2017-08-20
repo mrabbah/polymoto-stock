@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./homeWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="homeWin" height="100%" width="100%" style="margin:auto;" use="${homeWindow}">
+    <!-- <zscript src="/zs/home.zs"/> -->
+        <borderlayout> 
+            <north flex="true" collapsible="true" open="true" size="400px">
+                <groupbox width="100%" height="100%">
+                    <!--<label value="Vue globale sur le stock" style="color:red;font-family:  'Gill Sans',  'Gill Sans MT', Arial, Helvetica, sans-serif;font-size: x-large;"/>-->
+                    <!--<chart id="myChart1" title="Composition du stock" width="600px"
+                                   height="380" type="bar" threeD="true" fgAlpha="128" showLegend="false"
+                                   model="@{homeWin.modelpie}" />-->
+                    <chart id="myChart2" title="Composition du stock par date de péremption" width="1400px"
+                                   height="380" type="bar" threeD="true" fgAlpha="128" showLegend="false"
+                                   model="@{homeWin.modelpiePeremp}" />
+                </groupbox>
+            </north>           
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <label value="Lise des produits périssables dans les prochaines trois mois:" style="color:red;font-family:  'Gill Sans',  'Gill Sans MT', Arial, Helvetica, sans-serif;font-size: x-large;"/>
+                    <listbox id="lstObjet" model="@{homeWin.listeObjets}" selectedItem="@{homeWin.objetSelected}"  width="100%" height="520px" mold="paging" paginal="${paging}">                       
+                        <listhead sizable="true">
+                            <!--listheader width="32px" /-->
+                            <!--listheader label="Entrepôt" sort="auto(entrepot.code)" onSort="homeWin.sort(event)"/-->	
+                            <listheader label="Produit" sort="auto(produit.code)" onSort="homeWin.sort(event)"/>	
+                            <listheader label="Stock Réel" sort="auto(stockReel)" onSort="homeWin.sort(event)"/>
+                            <listheader label="Mois" if="${homeWin.produitPerissableManaged == true}" sort="auto(date_preremption)" 
+                                        onSort="homeWin.sort(event)"/>
+<!--                            <listheader width="32px" />-->
+                        </listhead>
+                        <listitem value="@{element}" self="@{each=element}">    
+                            <!--listcell image="/images/skin/icon_selection.png"/>
+                            <listcell>
+                                <textbox readonly="true" value="@{element.entrepot, save-when='self.onChange'}" inplace="true" width="99%"/>
+                            </listcell-->
+                            <listcell>
+                                <textbox readonly="true" value="@{element.produit, save-when='self.onChange'}" inplace="true" width="99%"/>
+                            </listcell>
+                            <listcell label="@{element.stockReel}" />
+                            <listcell>
+                                <datebox if="${homeWin.produitPerissableManaged == true}" format="MM/yyyy" readonly="true" value="@{element.date_preremption, save-when='self.onChange'}" inplace="true" width="99%"/>			
+                            </listcell>
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{homeWin.tailleListe}" pageSize="@{homeWin.maxNb}" onPaging="homeWin.getNextElements(event);" />
+                    
+                </groupbox>
+            </center>
+            <east id="eastPanel" size="200" flex="true" splittable="true" collapsible="true" open="true">
+                <groupbox>
+                    <calendar />
+                </groupbox>
+            </east>
+        </borderlayout>
+    </window>
+</zk>

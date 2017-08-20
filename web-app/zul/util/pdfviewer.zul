@@ -1,0 +1,16 @@
+
+<zk>
+    <zscript language="Java"><![CDATA[
+	import org.zkoss.util.media.AMedia;
+	AMedia content = (AMedia) arg.get("content");
+        ]]>
+    </zscript>
+    <window id="winPdf" title="EDITEUR PDF" border="normal" 
+    width="100%" height="100%"  position="center" visible="true"
+    closable="true" action="show: slideIn({duration: 1000}); hide: slideUp({duration: 300})" 
+    xmlns:c="client"  >
+        <iframe id="ipdfframe" src="http://www.choranet.com"
+    width="100%" height="100%" style="border: 1px solid gray" content="${content}" />
+    </window>
+<!--    onClose="self.visible = false; event.stopPropagation();"-->
+</zk>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./categorieProduitWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="categorieProduitWin" height="100%" width="100%" style="margin:auto;" use="${categorieProduitWindow}">
+    <!-- <zscript src="/zs/categorieProduit.zs"/> -->
+        <borderlayout>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="categorieProduitWin.select()" model="@{categorieProduitWin.listeObjets}" selectedItem="@{categorieProduitWin.objetSelected}" width="100%" height="100%" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+                            <auxheader colspan="1"/>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterCode" value="@{categorieProduitWin.filtre.code}" onChanging="categorieProduitWin.ofs; categorieProduitWin.filtre.code=event.value; categorieProduitWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterIntitule" value="@{categorieProduitWin.filtre.intitule}" onChanging="categorieProduitWin.ofs; categorieProduitWin.filtre.intitule=event.value; categorieProduitWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <combobox id="filtercocategorieParentes" model="@{categorieProduitWin.categorieParentes}" selectedItem="@{categorieProduitWin.filtre.categorieParente}" autocomplete="true" 
+                                          autodrop="true" mold="rounded" onSelect="categorieProduitWin.ofs=0;categorieProduitWin.filtrer()" onOK="categorieProduitWin.ofs=0;categorieProduitWin.filtrer()">
+                                    <comboitem self="@{each=elementfiltrecategorieParentes}" label="@{elementfiltrecategorieParentes}"/>
+                                </combobox>
+                            </auxheader>
+                            <auxheader colspan="1"/>
+                        </auxhead>
+                        <listhead sizable="true">
+                            <listheader width="32px" />
+                            <listheader label="Code" sort="auto(code)" onSort="categorieProduitWin.sort(event)"/>	
+                            <listheader label="Intitule" sort="auto(intitule)" onSort="categorieProduitWin.sort(event)"/>
+                            <listheader label="Categorie Parentes" sort="auto(categorieParente.intitule)" onSort="categorieProduitWin.sort(event)"/>
+                            <listheader width="32px" />
+                        </listhead>
+                        <listitem value="@{element}" self="@{each=element}">    
+                            <listcell image="/images/skin/icon_selection.png" />                                
+                            <listcell label="@{element.code}" />						
+                            <listcell label="@{element}" />                                
+                            <listcell label="@{element.categorieParente}" />                               
+                            <listcell image="/images/skin/database_delete.png">
+                                <attribute name="onClick">
+                                    <![CDATA[
+                                    Messagebox.show("Etes vous sûr de vouloir continuer ?", "Confirmation", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+                                        public void onEvent(Event evt) throws InterruptedException {
+                                            if (evt.getName().equals("onOK")) {
+                                                if(lstObjet.selectedItem != null)
+                                                    categorieProduitWin.delete();
+                                            } 
+                                        }
+                                    });
+                                    ]]>
+                                </attribute>                                
+                            </listcell>
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{categorieProduitWin.tailleListe}" pageSize="@{categorieProduitWin.maxNb}" onPaging="categorieProduitWin.getNextElements(event);" />
+                    <separator/>
+                    <grid id="grdCp">
+                        <columns>
+                            <column width="32px" />
+                            <column />
+                            <column />
+                            <column />
+                            <column width="32px" />
+                        </columns>
+                        <rows>
+                            <row>
+                                <image src="/images/skin/database_edit.png">
+                                    <attribute name="onClick">
+                                        <![CDATA[
+                                            cocategorieParentes.value = null;
+                                            categorieProduitWin.objet = com.choranet.gesticom.CategorieProduit.class.newInstance();
+                                            categorieProduitWin.rafraichirField();
+                                            categorieProduitWin.annulerSelection();
+                                            categorieProduitWin.isUpdate = false;
+                                        ]]>
+                                    </attribute>
+                                </image>
+								
+                                <textbox id="fieldcodebis" value="@{categorieProduitWin.objet.code, save-when='self.onChange'}" constraint="no empty: Veillez indiquez une valeur" inplace="true" width="99%">                                    
+                                    <attribute name="onOK">
+                                        <![CDATA[
+                                            if(self.value != null && !self.value.equals("") && fieldintitulebis.value != null && cocategorieParentes.selectedItem != null)                                              
+                                                    categorieProduitWin.addOrUpdate();
+                                            else
+                                                alert("Veillez remplire tous les champs nécessaires");
+                                        ]]>
+                                    </attribute>
+                                </textbox>
+								
+                                <textbox id="fieldintitulebis" value="@{categorieProduitWin.objet.intitule, save-when='self.onChange'}" constraint="no empty: Veillez indiquez une valeur" inplace="true" width="99%">                                    
+                                    <attribute name="onOK">
+                                        <![CDATA[ 
+                                            if(fieldcodebis.value != null && !fieldcodebis.value.equals("") && self.value != null && cocategorieParentes.selectedItem != null){
+                                                categorieProduitWin.addOrUpdate();
+                                            } else
+                                                alert("Veillez remplire tous les champs nécessaires");
+                                        ]]>    
+                                    </attribute>                                   
+                                </textbox>
+                                <combobox id="cocategorieParentes" model="@{categorieProduitWin.categorieParentesSelected}" 
+                                          selectedItem="@{categorieProduitWin.categorieParenteSelected, save-when='self.onChange'}" width="99%">                                                                         
+                                    <attribute name="onOK">
+                                        <![CDATA[
+                                        if(fieldcodebis.value != null && !fieldcodebis.value.equals("") && fieldintitulebis.value != null && cocategorieParentes.selectedItem != null)                                              
+                                            categorieProduitWin.addOrUpdate();
+                                        else
+                                                alert("Veillez remplire tous les champs nécessaires");
+                                        ]]>
+                                    </attribute>
+                                    <comboitem self="@{each=elementnewcategorieParente}" label="@{elementnewcategorieParente}" value="@{elementnewcategorieParente}"/>
+                                </combobox>
+                                
+                                <label/>
+								  
+                            </row>
+                        </rows>
+                    </grid>
+                    <separator/>
+                    <button id="btnPdf" onClick="categorieProduitWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="categorieProduitWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                    <fileupload id="btnImport" label="Import en masse" onUpload="categorieProduitWin.importation(event.getMedia())" image="/images/skin/BriefcaseOpen-16x16.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Rapport_des_locations" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.2100000000000002"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="288"/>
+	<parameter name="nomsociete" class="java.lang.String"/>
+	<parameter name="titrerapport" class="java.lang.String"/>
+	<parameter name="adressesociete" class="java.lang.String"/>
+	<parameter name="codePostalesociete" class="java.lang.String"/>
+	<parameter name="villesociete" class="java.lang.String"/>
+	<parameter name="payssociete" class="java.lang.String"/>
+	<parameter name="telephonesociete" class="java.lang.String"/>
+	<parameter name="emailsociete" class="java.lang.String"/>
+	<parameter name="faxsociete" class="java.lang.String"/>
+	<parameter name="sitesociete" class="java.lang.String"/>
+	<parameter name="patentesociete" class="java.lang.String"/>
+	<parameter name="rcsociete" class="java.lang.String"/>
+	<parameter name="idfsociete" class="java.lang.String"/>
+	<parameter name="cnsssociete" class="java.lang.String"/>
+	<parameter name="slogan" class="java.lang.String"/>
+	<parameter name="entete" class="java.lang.String"/>
+	<parameter name="pied" class="java.lang.String"/>
+	<parameter name="document" class="java.util.Collection"/>
+	<parameter name="DocumentSubReport" class="java.io.File"/>
+	<parameter name="nomclient" class="java.lang.String"/>
+	<parameter name="telclient" class="java.lang.String"/>
+	<parameter name="faxclient" class="java.lang.String"/>
+	<parameter name="adresseclient" class="java.lang.String"/>
+	<parameter name="villeclient" class="java.lang.String"/>
+	<parameter name="arretermessage" class="java.lang.String"/>
+	<parameter name="paysclient" class="java.lang.String"/>
+	<parameter name="autresfrais" class="java.lang.Double"/>
+	<parameter name="champ1Nom" class="java.lang.String"/>
+	<parameter name="champ2Nom" class="java.lang.String"/>
+	<parameter name="champ3Nom" class="java.lang.String"/>
+	<parameter name="champ1Valeur" class="java.lang.String"/>
+	<parameter name="champ2Valeur" class="java.lang.String"/>
+	<parameter name="champ3Valeur" class="java.lang.String"/>
+	<parameter name="champ1Date" class="java.lang.String"/>
+	<parameter name="champ2Date" class="java.lang.String"/>
+	<parameter name="champ3Date" class="java.lang.String"/>
+	<parameter name="Image" class="java.io.InputStream"/>
+	<parameter name="totalht" class="java.lang.Double"/>
+	<parameter name="totaltva" class="java.lang.Double"/>
+	<parameter name="totalttc" class="java.lang.Double"/>
+	<parameter name="champ4Nom" class="java.lang.String"/>
+	<parameter name="champ4Valeur" class="java.lang.String"/>
+	<parameter name="champ4Date" class="java.lang.String"/>
+	<background>
+		<band/>
+	</background>
+	<pageHeader>
+		<band height="85"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="150">
+			<textField evaluationTime="Report">
+				<reportElement mode="Transparent" x="278" y="96" width="15" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="57" y="78" width="120" height="13" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ4Valeur}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="202" y="78" width="82" height="13" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ4Date}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="337" y="69" width="50" height="13"/>
+				<textElement markup="none">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Adresse : ]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="5" y="64" width="49" height="13" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ3Nom}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="387" y="22" width="152" height="13"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{nomclient}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="319" height="25" forecolor="#000000"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{titrerapport}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="319" y="32" width="13" height="64"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="327" y="5" width="228" height="107"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="26" width="290" height="67"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="342" y="107" width="200" height="6"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="351" y="93" width="188" height="13"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{villeclient}+", "+$P{paysclient}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="202" y="50" width="82" height="13" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ2Date}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="201" y="35" width="83" height="13"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ1Date}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="268" y="96" width="10" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[/]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="545" y="32" width="20" height="64"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="5" y="50" width="49" height="13" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ2Nom}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="57" y="50" width="120" height="13" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ2Valeur}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="202" y="64" width="82" height="13" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ3Date}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="57" y="64" width="120" height="13" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ3Valeur}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="387" y="54" width="152" height="15"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{faxclient}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="337" y="54" width="50" height="13"/>
+				<textElement markup="none">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Fax          :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="336" y="39" width="51" height="13"/>
+				<textElement markup="none">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Tél           :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="5" y="35" width="49" height="13"/>
+				<textElement verticalAlignment="Top">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ1Nom}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="253" y="96" width="15" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="387" y="39" width="152" height="13"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{telclient}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="336" y="22" width="51" height="13"/>
+				<textElement markup="none">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Client      :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="179" y="35" width="20" height="13"/>
+				<textElement textAlignment="Center" markup="none">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[du]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="5" y="78" width="49" height="13" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ4Nom}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="387" y="69" width="152" height="13"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{adresseclient}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="229" y="96" width="24" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Page ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="57" y="35" width="120" height="13"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ1Valeur}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="345" y="0" width="200" height="17"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="319" y="35" width="13" height="61"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="57" y="78" width="120" height="13" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ4Valeur}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="201" y="78" width="83" height="13" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ4Date}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="5" y="64" width="49" height="13" isRemoveLineWhenBlank="true"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{champ3Nom}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="387" y="22" width="152" height="13"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{nomclient}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="337" y="69" width="50" height="13"/>
+				<textElement markup="none">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Adresse : ]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="547">
+			<subreport>
+				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="555" height="152" isRemoveLineWhenBlank="true"/>
+				<subreportParameter name="totalht">
+					<subreportParameterExpression><![CDATA[$P{totalht}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="autresfrais">
+					<subreportParameterExpression><![CDATA[$P{autresfrais}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="arretermessage">
+					<subreportParameterExpression><![CDATA[$P{arretermessage}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="totalttc">
+					<subreportParameterExpression><![CDATA[$P{totalttc}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="totaltva">
+					<subreportParameterExpression><![CDATA[$P{totaltva}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{document})]]></dataSourceExpression>
+				<subreportExpression class="java.io.File"><![CDATA[$P{DocumentSubReport}]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="60"/>
+	</pageFooter>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>

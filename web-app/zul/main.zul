@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?page id="choraerp" title="Gestion stock CS.DR.Faraj"?>
+<?link rel="stylesheet" type="text/css" href="/macros/category.css.dsp?v=${desktop.webApp.build}"?>
+<?script type="text/javascript" src="/macros/zksandbox.js.dsp?v=${desktop.webApp.build}"?>
+<?script type="text/javascript" content="jq.IE6_ALPHAFIX=/24x24.png|32x32.png|48x48.png|128x128.png|ButtonBlue.png|ButtonGray.png|small.png|small-sel.png|normal.png|normal-sel.png|large.png|large-sel.png/;"?>
+<?meta name="keywords" content="Gestion stock CS.DR FARAJ" ?>
+<?component name="category" extends="button" widgetClass="com.choranet.zk.Category" mold="default"?>
+<?component name="categorybar" extends="div" widgetClass="com.choranet.zk.Categorybar"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" root="mainWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c" ?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <style dynamic="true">
+        .z-tab-ver .z-tab-ver-hm {
+        height : 62px
+        }
+    </style>
+    <zscript src="./main.zs"/>
+<!--    <zscript src="/vs.zs"/>-->
+
+    <window id="mainWin" height="700px" width="100%" style="margin-left:auto;margin-right:auto;margin-top:5px;" use="${mainWindow}">
+        <borderlayout id="main">
+            <north border="none" size="90px" sclass="demo-header" collapsible="true">
+                <div>         
+               
+                    <div sclass="demo-logo pointer">
+                        <a href="@{mainWin.site}" target="_blank">
+                            <image width="180px" height="80px" content="@{mainWin.trans_logo}"/>
+                        </a>
+                    </div>
+                    <categorybar zclass="demo-categorybar" id="header">   
+                        <category id="cg_tdbgc" image="${imgPath}/ChartLogo600.png" label="Tableau de Bord" onClick='xcontents.src = "/zul/home.zul"' zclass="demo-category" />  
+                        <!--category id="cg_bc_vente" image="${imgPath}/bc.png" label="Bon commande" onClick='xcontents.src = "/zul/gesticom/bonCommande.zul?bonPret=false&amp;type=ACHAT"' zclass="demo-category" />  
+                        <category id="cg_bl_vente" image="${imgPath}/bl.png" label="Bon Réception" onClick='xcontents.src = "/zul/gesticom/bonLivraison.zul?estBonRetour=false&amp;type=ACHAT"' zclass="demo-category" />  
+                        <category id="cg_entrepot" image="${imgPath}/palette.png" label="Entrepôts" onClick='xcontents.src = "/zul/gesticom/stock/entrepot.zul"' zclass="demo-category" /-->  
+                        <category id="cg_produit" image="${imgPath}/product-icon-header.png" label="Produits" onClick='xcontents.src = "/zul/gesticom/stock/produit.zul"' zclass="demo-category" />  
+                        <category id="cg_catproduit" image="${imgPath}/colis.png" label="Catégories produits" onClick='xcontents.src = "/zul/gesticom/admin/categorieProduit.zul"' zclass="demo-category" />  
+                        <category id="cg_securitestock" image="${imgPath}/securitestock.png" label="Sécurité stock" onClick='xcontents.src = "/zul/gesticom/stock/securitestock.zul"' zclass="demo-category" />  
+                        <category id="cg_mouvementstock" image="${imgPath}/mouvements.png" label="Mouvements stock" onClick='xcontents.src = "/zul/gesticom/stock/mouvementStock.zul"' zclass="demo-category" />  
+                        <category id="cg_inventaire" image="${imgPath}/carton_maron.png" label="Inventaire" onClick='xcontents.src = "/zul/gesticom/stock/inventaire.zul"' zclass="demo-category" />  
+<!--                        <category id="cg_clientinfo" image="${imgPath}/EnterpriseAndIntegration-48x48.png" label="Informations société" onClick='xcontents.src = "/zul/securite/clientinfo.zul"' zclass="demo-category" />  -->
+                        <category zclass="demo-category" id="cg_help" image="${imgPath}/merlin.gif" label="Aide" onClick='helpmenu.open(self, "after_start")' />  
+                    </categorybar>
+                </div>
+            </north>
+            <center  flex="true">   
+                <include src="/zul/home.zul"  style="padding:3px;" id="xcontents" progressing="true" />
+            </center>
+        </borderlayout>    
+        <popup id="helpmenu" width="230px">
+            <toolbar orient="vertical" mold="panel">
+                <toolbarbutton label="Aide" width="200px" image="${imgPath}/help.png" onClick="" />
+                <separator bar="true" width="200px" />
+                <toolbarbutton label="A propos de" width="200px" image="${imgPath}/about_32.png">
+                    <attribute name="onClick">
+                    <![CDATA[
+                        helpmenu.close();
+                        Executions.createComponents("/zul/aide/apropos.zul", null, null).doModal();
+                    ]]>
+                    </attribute>
+                </toolbarbutton>
+            </toolbar>
+        </popup>
+    </window>
+</zk>

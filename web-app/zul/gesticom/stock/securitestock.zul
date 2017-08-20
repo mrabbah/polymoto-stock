@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./securitestockWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="securitestockWin" height="100%" width="100%" style="margin:auto;" use="${securitestockWindow}">
+    <!-- <zscript src="/zs/securitestock.zs"/> -->
+        <borderlayout>            
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="securitestockWin.select()" model="@{securitestockWin.listeObjets}" selectedItem="@{securitestockWin.objetSelected}"  width="100%" height="520px" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+                            <auxheader colspan="1"/>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <combobox id="filterentrepot" model="@{securitestockWin.entrepots}" selectedItem="@{securitestockWin.filtre.entrepot}" autocomplete="true" autodrop="true" mold="rounded" onSelect="securitestockWin.ofs=0;securitestockWin.filtrer()" onOK="securitestockWin.ofs=0;securitestockWin.filtrer()">
+                                    <comboitem self="@{each=elementfiltreentrepot}" label="@{elementfiltreentrepot}"/>
+                                </combobox>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <combobox id="filterproduit" model="@{securitestockWin.listeProduits}" selectedItem="@{securitestockWin.filtre.produit}" autocomplete="true" autodrop="true" mold="rounded" onSelect="securitestockWin.ofs=0;securitestockWin.filtrer()" onOK="securitestockWin.ofs=0;securitestockWin.filtrer()">
+                                    <comboitem self="@{each=elementfiltreproduit}" label="@{elementfiltreproduit}"/>
+                                </combobox>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterStockMin" value="@{securitestockWin.filtre.stockMin}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                securitestockWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(securitestockWin.filtre.stockMin != null) {
+                                                                securitestockWin.filtre.stockMin = null;
+                                                        }
+                                                } else {
+                                                        securitestockWin.filtre.stockMin=new Double(event.value);
+                                                }
+                                                securitestockWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterStockMax" value="@{securitestockWin.filtre.stockMax}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                securitestockWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(securitestockWin.filtre.stockMax != null) {
+                                                                securitestockWin.filtre.stockMax = null;
+                                                        }
+                                                } else {
+                                                        securitestockWin.filtre.stockMax=new Double(event.value);
+                                                }
+                                                securitestockWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterStockReel" value="@{securitestockWin.filtre.stockReel}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                securitestockWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(securitestockWin.filtre.stockReel != null) {
+                                                                securitestockWin.filtre.stockReel = null;
+                                                        }
+                                                } else {
+                                                        securitestockWin.filtre.stockReel=new Double(event.value);
+                                                }
+                                                securitestockWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDatePreremption" if="${securitestockWin.produitPerissableManaged == true}" format="dd/MM/yyyy" value="@{securitestockWin.filtre.date_preremption}" 
+                                onOK="securitestockWin.ofs=0; securitestockWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+<!--                            <auxheader colspan="1"/>-->
+                        </auxhead>
+                        <listhead sizable="true">
+                            <listheader width="32px" />
+                            <listheader label="Entrepôt" sort="auto(entrepot.code)" onSort="securitestockWin.sort(event)"/>	
+                            <listheader label="Produit" sort="auto(produit.code)" onSort="securitestockWin.sort(event)"/>	
+                            <listheader label="Stock Min" sort="auto(stockMin)" onSort="securitestockWin.sort(event)"/>	
+                            <listheader label="Stock Max" sort="auto(stockMax)" onSort="securitestockWin.sort(event)"/>	
+                            <listheader label="Stock Réel" sort="auto(stockReel)" onSort="securitestockWin.sort(event)"/>
+                            <listheader label="DLC" if="${securitestockWin.produitPerissableManaged == true}" sort="auto(date_preremption)" 
+                                        onSort="securitestockWin.sort(event)"/>
+<!--                            <listheader width="32px" />-->
+                        </listhead>
+                        <listitem value="@{element}" self="@{each=element}">    
+                            <listcell image="/images/skin/icon_selection.png"/>
+                            <listcell>
+                                <textbox readonly="true" value="@{element.entrepot, save-when='self.onChange'}" inplace="true" width="99%"/>
+                            </listcell>
+                            <listcell>
+                                <textbox readonly="true" value="@{element.produit, save-when='self.onChange'}" inplace="true" width="99%"/>
+                            </listcell>
+                            <listcell>
+                                <doublebox readonly="true" value="@{element.stockMin, save-when='self.onChange'}" inplace="true" width="99%" />
+                            </listcell>							
+                            <listcell>
+                                <doublebox readonly="true" value="@{element.stockMax, save-when='self.onChange'}" inplace="true" width="99%" />
+                            </listcell>							
+                            <listcell label="@{element.stockReel}" />
+                            <listcell>
+                                <datebox if="${securitestockWin.produitPerissableManaged == true}" format="dd/MM/yyyy" readonly="true" value="@{element.date_preremption, save-when='self.onChange'}" inplace="true" width="99%"/>			
+                            </listcell>
+<!--                            <listcell image="/images/skin/database_delete.png">
+                                <attribute name="onClick">
+                                        <![CDATA[
+                                            securitestockWin.delete();
+                                            securitestockWin.objet = com.choranet.gesticom.Securitestock.class.newInstance();
+                                            securitestockWin.rafraichirField();
+                                            securitestockWin.rafraichirList();
+                                            securitestockWin.isUpdate = false;
+                                            securitestockWin.entrepotSelected = null;
+                                            securitestockWin.produitSelected = null;
+                                            securitestockWin.actualiserValeurAssociation();
+                                        ]]>
+                                </attribute>
+                            </listcell>-->
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{securitestockWin.tailleListe}" pageSize="@{securitestockWin.maxNb}" onPaging="securitestockWin.getNextElements(event);" />
+                    <separator/>
+                    <grid>
+                        <columns>
+                            <column width="32px" />			
+                            <column />
+                            <column />
+                            <column />
+                            <column />
+                            <column />
+                            <column />
+<!--                            <column width="32px" />			-->
+                        </columns>
+                        <rows>
+                            <row>
+                                <image src="/images/skin/database_edit.png">
+                                    <attribute name="onClick">
+                                        <![CDATA[
+                                            securitestockWin.objet = com.choranet.gesticom.Securitestock.class.newInstance();
+                                            securitestockWin.rafraichirField();
+                                            securitestockWin.rafraichirList();
+                                            securitestockWin.isUpdate = false;
+                                            securitestockWin.entrepotSelected = null;
+                                            securitestockWin.produitSelected = null;
+                                            securitestockWin.actualiserValeurAssociation();
+                                        ]]>
+                                    </attribute>
+                                </image>
+                                
+                                <combobox id="coentrepots" inplace="true" width="99%" constraint="no empty : Veillez choisir une valeur" model="@{securitestockWin.entrepots}" selectedItem="@{securitestockWin.entrepotSelected}" 
+                                          onSelect="securitestockWin.entrepotChoisi()" onOK="securitestockWin.entrepotChoisi()">                                    
+                                    <comboitem self="@{each=elemententrepot}" label="@{elemententrepot}"/>
+                                </combobox>
+
+                                <combobox id="coproduits" inplace="true" width="99%" constraint="no empty : Veillez choisir une valeur" model="@{securitestockWin.produits}" 
+                                          selectedItem="@{securitestockWin.produitSelected}" onOK="securitestockWin.addOrUpdate();">
+                                    <comboitem self="@{each=elementproduit}" label="@{elementproduit}"/>
+                                </combobox>
+                            
+                                <doublebox id="fieldStockMin" inplace="true" width="99%" constraint="no empty, no negative: Veillez indiquez une valeur positive" value="@{securitestockWin.objet.stockMin, save-when='self.onChange'}" onOK="securitestockWin.addOrUpdate();"/>
+                            
+                                <doublebox id="fieldStockMax" inplace="true" width="99%" constraint="no empty, no negative: Veillez indiquez une valeur positive" value="@{securitestockWin.objet.stockMax, save-when='self.onChange'}" onOK="securitestockWin.addOrUpdate();"/>
+                            
+                                <doublebox id="fieldStockReel" inplace="true" readonly="true" width="99%" constraint="no empty, no negative: Veillez indiquez une valeur positive" value="@{securitestockWin.objet.stockReel, save-when='self.onChange'}" />
+                                
+                                <datebox id="fieldPreRemption" disabled="true" inplace="true" width="99%"/>
+                                
+                                <label/>
+                            </row>												
+                        </rows>
+                    </grid>
+                    <separator/>
+                    <button id="btnPdf" onClick="securitestockWin.genererRapportPdf()" label="Générer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="securitestockWin.genererRapportExcel()" label="Générer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

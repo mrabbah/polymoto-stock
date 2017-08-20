@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page id="ERROR 500" title="gesticom 500"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	
+<window id="errorWnd"  border="normal" height="150px" width="400px" mode="modal" position="center">
+    <caption image="/images/skin/redshd.gif" label="Erreur 500!"/>
+    <label id="messageaerrer" value="Erreur lors de l'exécution, veuillez rafraichir votre navigateur!" style="color:red;font-family:  'Gill Sans',  'Gill Sans MT', Arial, Helvetica, sans-serif;font-size: x-large;" />
+</window>    
+</zk>

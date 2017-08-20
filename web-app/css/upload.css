@@ -1,0 +1,112 @@
+/* 
+    Document   : upload
+    Created on : 27 mai 2011, 04:02:11
+    Author     : RABBAH
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+/*****Panel Customize*****/
+.z-panel-tl {
+    height: 4px;
+}
+.z-panel-hl .z-panel-header {
+    padding: 2px 3px 5px;
+}
+.z-caption-l {
+    padding-left: 10px;
+    font-weight: bold;
+}
+.z-panel-cl {
+    padding-left: 1px;
+}
+.z-panel-cr {
+    padding-right: 1px;
+}
+.z-panel-noborder .z-panel-btm div.footer {
+    padding: 2px 0;
+    border-left: 0 none;
+    border-right: 0 none;
+}
+.z-panel .z-panel-cl .z-panel-children-noborder {
+    padding-left: 5px;
+    padding-right: 3px;
+    background-color: #F1F9FF;
+}
+ 
+/*****Text Style*****/
+span.name {
+    font-size: 12px;
+    display: block;
+    width: 50px;
+    text-align: right;
+    font-weight: bold;
+}
+.attachBtn .z-toolbarbutton-cnt {
+    font-weight: bold;
+    color: #F25D45;
+}
+.newFile {
+    padding-left: 10px;
+}
+ 
+/*****Attach Field*****/
+.z-toolbar {
+    background: none;
+}
+.z-toolbar .fileList a{
+    border: 0 none;
+    text-decoration: underline;
+    background: none;
+}
+ 
+/*****Input Field*****/
+.input-area {
+    margin: 0 3px;
+    border-top: 1px solid #ECECEC;
+}
+.input-area .z-textbox {
+    border: 0 none;
+}
+ 
+/*****UPMSample1*****/
+.UPMSample1 .msg span {
+    height: 15px;
+    padding-left:10px;
+    font-size:12px;
+}
+.UPMSample1 .z-progressmeter {
+    width: 100px;
+    height: 10px;
+}
+ 
+/*****UPMSample2*****/
+.UPMSample2 {
+    background:#F4F8FF;
+    border-top: 1px solid #99AABD;
+    border-bottom: 1px solid #99AABD;
+    font-family: tahoma,helvetica,arial,sans-serif;
+    font-size: 11px;
+    padding: 3px;
+    width: 542px;
+    color: #0F3B82;
+}
+.UPMSample2 a {
+    color: #0366AC;
+    font-weight: bold;
+    cursor: pointer;
+}
+.UPMSample2 .float-left {
+    float: left;
+}
+.UPMSample2 .float-right {
+    float: right;
+}
+.UPMSample2 .clear {
+    clear: both;
+}

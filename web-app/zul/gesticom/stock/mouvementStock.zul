@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./mouvementStockWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="mouvementStockWin" height="100%" width="100%" style="margin:auto;" use="${mouvementStockWindow}">
+    <!-- <zscript src="/zs/mouvementStock.zs"/> -->
+        <popup id="alertQuantite" width="200px" hflex="true" vflex="true">  
+            <label id="lbQuantite" value="" style="color: #F52203;"  /> 
+        </popup>
+        <borderlayout>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="mouvementStockWin.select()" model="@{mouvementStockWin.listeObjets}" selectedItem="@{mouvementStockWin.objetSelected}"  width="100%" height="515px" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+                            <auxheader colspan="1"/>
+							
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDate" format="dd/MM/yyyy" value="@{mouvementStockWin.filtre.date}" onOK="mouvementStockWin.ofs=0; mouvementStockWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+<!--                                <textbox id="filterTypeMouvement" value="@{mouvementStockWin.filtre.typeMouvement}" onOK="mouvementStockWin.ofs; mouvementStockWin.filtrer(); self.focus();" width="100%"/>-->
+                                <combobox id="filtertypeMouvement" onSelect="mouvementStockWin.ofs; mouvementStockWin.filtre.typeMouvement=self.value; mouvementStockWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="90%"><!--
+-->                                    
+                                    <comboitem label="RECEPTION" value="RECEPTION"/>
+                                    <comboitem label="INVENTAIRE" value="INVENTAIRE"/>
+                                    <comboitem label="UTILISATION" value="UTILISATION"/><!--
+                             <comboitem self="@{each=elementfiltretypeMouvement}" label="@{elementfiltretypeMouvement}"/>-->
+                                </combobox>
+                            </auxheader>                         
+                            <auxheader colspan="1">
+                                <combobox id="filterproduit" model="@{mouvementStockWin.produits}" selectedItem="@{mouvementStockWin.filtre.produit}" 
+                                          autocomplete="true" mold="rounded" onSelect="mouvementStockWin.ofs=0;mouvementStockWin.filtrer()" 
+                                          onOK="mouvementStockWin.ofs=0;mouvementStockWin.filtrer()" width="99%">
+                                    <comboitem self="@{each=elementfiltreproduit}" label="@{elementfiltreproduit}"/>
+                                </combobox>
+                            </auxheader>
+								
+                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDatePreremption" if="${mouvementStockWin.produitPerissableManaged == true}" format="dd/MM/yyyy" value="@{mouvementStockWin.filtre.date_preremption}" 
+                                         onOK="mouvementStockWin.ofs=0; mouvementStockWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>                                                                                   
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterQuantite" value="@{mouvementStockWin.filtre.quantite}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                mouvementStockWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(mouvementStockWin.filtre.quantite != null) {
+                                                                mouvementStockWin.filtre.quantite = null;
+                                                        }
+                                                } else {
+                                                        mouvementStockWin.filtre.quantite=new Double(event.value);
+                                                }
+                                                mouvementStockWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>								 
+                        </auxhead>
+                        <listhead sizable="true">
+                            <listheader width="32px" />
+							
+                            <listheader label="Date" sort="auto(date)" onSort="mouvementStockWin.sort(event)"/>	
+                            <listheader label="Type Mouvement" sort="auto(typeMouvement)" onSort="mouvementStockWin.sort(event)"/>
+                            <listheader label="Produit" sort="auto(produit.designation)" onSort="mouvementStockWin.sort(event)"/>
+                            <listheader label="Date préremption" sort="auto(date_preremption)" onSort="mouvementStockWin.sort(event)" if="${mouvementStockWin.produitPerissableManaged == true}"/>	
+                            <listheader label="Quantité Mvm" sort="auto(quantite)" onSort="mouvementStockWin.sort(event)"/>
+							                                 
+                        </listhead>
+                        <listitem value="@{element}" self="@{each=element}">    
+                            <listcell image="/images/skin/icon_selection.png"/>
+                            
+                            <listcell>			
+                                <datebox format="dd/MM/yyyy" readonly="true" value="@{element.date, save-when='self.onChange'}" inplace="true" width="99%"/>			
+                            </listcell>	
+                            
+                            <listcell>		
+                                <textbox readonly="true" value="@{element.typeMouvement, save-when='self.onChange'}" inplace="true" width="99%"/>			
+                            </listcell>							
+                            <listcell>
+                                <textbox readonly="true" value="@{element.produit, save-when='self.onChange'}" inplace="true" width="99%"/>
+                            </listcell>
+                            
+                            <listcell>			
+                                <datebox if="${mouvementStockWin.produitPerissableManaged == true}" format="dd/MM/yyyy" readonly="true" value="@{element.date_preremption, save-when='self.onChange'}" inplace="true" width="99%"/>			
+                            </listcell>	
+                            
+                            <listcell>		
+                                <doublebox readonly="true" value="@{element.quantite, save-when='self.onChange'}" inplace="true" width="99%" />			
+                            </listcell>	
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{mouvementStockWin.tailleListe}" pageSize="@{mouvementStockWin.maxNb}" onPaging="mouvementStockWin.getNextElements(event);" />
+                    <separator/>
+                    <grid>
+                        <columns>
+                            <column width="32px" />			
+                            <column />		
+                            <column />		
+                            <column />
+                            <column />		                            	
+                            <column />
+                            <column />		
+                            <column if="${mouvementStockWin.multiEntrepot == true}"/>
+                        </columns>
+                        <rows>
+                            <row>
+                                <image src="/images/skin/database_edit.png"/>
+                                
+                                <datebox id="fielddatebis" format="dd/MM/yyyy" value="@{mouvementStockWin.objet.date, save-when='self.onChange'}" width="90%">
+                                    <attribute name="onChange">
+                                        <![CDATA[
+                                            //mouvementStockWin.objet.typeMouvement = "UTILISATION";
+                                            mouvementStockWin.empSourceSelected = mouvementStockWin.empSources.get(0);
+                                            
+                                            //mouvementStockWin.updateProduitListAndEmpDestination(mouvementStockWin.empSourceSelected);
+                                        ]]>
+                                    </attribute>
+                                </datebox>
+                                
+                                <combobox  id="fieldtypeMouvementbis" readonly="true" selectedItem="@{mouvementStockWin.objet.typeMouvement}"  width="90%" >
+                                    <comboitem label="RECEPTION" value="RECEPTION"/>
+                                    <comboitem label="UTILISATION" value="UTILISATION"/>
+                                    <attribute name="onSelect">
+                                        <![CDATA[
+                                            if(self.selectedItem.value.equals("UTILISATION")) {
+                                                codlcs.visible = true;
+                                                fieldDate.visible = false;
+
+                                            } else {
+                                                codlcs.visible = false;
+                                                fieldDate.visible = true;
+                                            }
+                                        ]]>
+                                    </attribute>
+                                    <comboitem self="@{each=elementTypeMvt}" label="@{elementTypeMvt}"/>
+                                </combobox>
+
+                                <!--<textbox readonly="true" id="fieldtypeMouvementbis" value="@{mouvementStockWin.objet.typeMouvement, save-when='self.onChange'}" onOK="mouvementStockWin.add();" width="91%"/>-->
+                                
+                               <!--  <combobox id="coempSources" readonly="true" model="@{mouvementStockWin.empSources}" selectedItem="@{mouvementStockWin.empSourceSelected, save-when='self.onChange'}" onOK="mouvementStockWin.add();" width="99%">
+                                    <attribute name="onSelect">
+                                        <![CDATA[
+                                            mouvementStockWin.updateProduitListAndEmpDestination(mouvementStockWin.empSourceSelected);
+                                        ]]>
+                                    </attribute>
+                                    <comboitem self="@{each=currentelementSource}" label="@{currentelementSource}"/>
+                                </combobox>-->
+                                
+                                <combobox id="coproduits" readonly="true" model="@{mouvementStockWin.produits}" selectedItem="@{mouvementStockWin.produitSelected}"  width="90%" >
+                                    <attribute name="onSelect">
+                                        <![CDATA[
+                                            mouvementStockWin.getDLCs();
+                                            //mouvementStockWin.getPrixMvmsInvoker();
+                                            mouvementStockWin.getQuantiteProduitEnEntrepot();
+                                            //mouvementStockWin.objet.quantite = fieldquantitebis.value; 
+                                        ]]>
+                                    </attribute>
+                                    <comboitem self="@{each=elementproduit}" label="@{elementproduit}"/>
+                                </combobox>
+                                
+<!--                                 <datebox if="${mouvementStockWin.produitPerissableManaged == true}" value="@{element.date_preremption, save-when='self.onChange'}" onOK="mouvementStockWin.add();" format="dd/MM/yyyy" width="99%"/>			-->
+                            <hbox>
+                                <combobox id="codlcs" if="${mouvementStockWin.produitPerissableManaged == true}" readonly="true" model="@{mouvementStockWin.dlcs}" selectedItem="@{mouvementStockWin.dlcSelected, save-when='self.onChange'}"  width="99%" visible="false">
+                                    <attribute name="onSelect">
+                                        <![CDATA[
+                                            fieldquantitebis.value = mouvementStockWin.getQuantiteProduiEnEntrepotPourDatePreremption();
+                                            mouvementStockWin.objet.quantite = fieldquantitebis.value;
+                                            //mouvementStockWin.getPrixMvmsInvoker();
+                                        ]]>
+                                    </attribute>
+                                    <comboitem self="@{each=elementdlc}" label="@{elementdlc, converter=com.choranet.zk.SimpleDateConverter}" />
+                                </combobox>
+
+                                <datebox id="fieldDate" format="MM/yyyy" value="@{mouvementStockWin.dlcSelected}" width="90%" visible="false"/>
+                            </hbox>    
+                                <doublebox id="fieldquantitebis" value="@{mouvementStockWin.objet.quantite}" onOK="mouvementStockWin.add();" width="90%" >
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                            /*if ((fieldquantitebis.value != null) && (!event.value.equals(""))&& (Double.valueOf(event.value) > fieldquantitebis.value)){
+                                                lbQuantite.value = "Attention la valeur indiquée est plus grande que la quantité permise : " + mouvementStockWin.objet.quantite;
+                                                alertQuantite.open(self, "after_start");
+                                            } else alertQuantite.close();*/
+                                        ]]>
+                                    </attribute>
+                                </doublebox>
+                                
+                                <!-- <combobox id="coempDestinations" readonly="true" model="@{mouvementStockWin.empDestinations}" selectedItem="@{mouvementStockWin.empDestinationSelected, save-when='self.onChange'}" constraint="no empty: Veillez indiquez une valeur" onOK="mouvementStockWin.add();" width="99%" if="${mouvementStockWin.multiEntrepot == true}">
+                                    <comboitem self="@{each=elementempDestination}" label="@{elementempDestination}"/>
+                                </combobox>-->
+								  
+                            </row>
+                        </rows>
+                    </grid>
+                    <separator/>
+<!--                    <button id="btnPdf" onClick="mouvementStockWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="mouvementStockWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>-->
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>

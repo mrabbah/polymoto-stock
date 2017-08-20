@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./bonCommandeWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+        
+    <window id="bonCommandeWin" height="100%" width="100%" style="margin:auto;" use="${bonCommandeWindow}">
+    <!-- <zscript src="/zs/bonCommande.zs"/> -->        
+        <popup id="informationsporduit" width="200px" >  
+            <label id="lbStock" value="" style="color: #F52203;"  /> 
+        </popup>
+        <borderlayout>
+            <west id="westPanel" title="Gestion des lignes de produits" size="100%" flex="true" splittable="true" collapsible="true" open="false" border="none">
+                <borderlayout>
+                    <west size="200px" flex="true" border="none">
+                        <vbox height="100%">
+                            <separator />
+                            <grid fixedLayout="true" span="true" sizedByContent="true">
+                                <rows>
+                                    <row>
+                                        <label value="Numéro BC" style="font-size: 10px;font-weight: bold;"/>
+                                    </row>
+                                    <row>
+                                        <textbox id="fieldNumBC" value="@{bonCommandeWin.objet.numBC, save-when='triggerBtn.onClick'}"  width="99%"/>                                                                                                                        
+                                    </row>
+                                    <row>
+                                        <label value="Date bon de commande" style="font-size: 10px;font-weight: bold;"/>
+                                    </row>
+                                    <row>
+                                        <datebox id="fieldDate" constraint="no empty:Veuillez indiquez la date du Bon de ${operation}" format="dd/MM/yyyy" value="@{bonCommandeWin.objet.date, save-when='triggerBtn.onClick'}" width="99%"/>
+                                    </row>                                    
+                                </rows>
+                            </grid>
+                            <separator />
+                            <grid fixedLayout="true" span="true" sizedByContent="true">
+                                <rows>
+                                    <row>
+                                        <label value="TOTAL HT" style="font-size: 10px;font-weight: bold;"/>
+                                    </row>
+                                    <row>
+                                        <doublebox id="fieldTotalHt" format="#,##0.##" value="@{bonCommandeWin.objet.trans_totalht}" readonly="true" width="99%" style="font-weight:bold;color:#093;"/>
+                                    </row>
+                                </rows>
+                            </grid>	
+                        </vbox>
+                    </west>
+                    <center border="none">
+                        <groupbox height="100%">
+                            <tabbox height="490px">
+                                <tabs>
+                                    <tab label="Lignes produits" />
+                                </tabs>
+                                <tabpanels>
+                                    <tabpanel>
+                                        <vbox width="100%">
+                                            <listbox id="lstligneProduits" model="@{bonCommandeWin.objet.ligneProduits}"  rows="10" sizedByContent="true" span="true">
+                                                <listhead sizable="true">
+                                                    <listheader width="32px"/>
+                                                    <listheader label="Séquence" width="70px"/>	
+                                                    <listheader label="Produit" width="300px"/>	
+                                                    <listheader label="Quantité" width="70px"/>	
+                                                    <listheader label="Prix" width="90px"/>	
+                                                    <listheader label="Prix déduit" width="90px"/>	
+                                                    <listheader label="Sous total" width="150px"/>	
+                                                </listhead>
+                                                <listitem value="@{lignepdt}" self="@{each=lignepdt}">    
+                                                    <listcell image="/images/skin/database_delete.png" onClick="bonCommandeWin.deleteLigneProduit(self.parent.value)"/>
+                                                    <listcell>
+                                                        <intbox format="#,##0" value="@{lignepdt.sequenceLigne, save-when='self.onChange'}" inplace="true" onChange='self.style="font-weight:bold"' width="99%" />
+                                                    </listcell>							
+                                                    <listcell>
+                                                        <textbox value="@{lignepdt.produit}" inplace="true" readonly="true"  hflex="1"/>
+                                                    </listcell>
+                                                    <listcell>
+                                                        <doublebox format="#,##0.##" value="@{lignepdt.quantite, save-when='self.onChange'}" constraint="no negative,no empty:Veuillez indiquez une valeur positive" inplace="true" width="99%" >
+                                                            <attribute name="onChanging">
+                                                                <![CDATA[
+                                                                    if(event.value != null && !event.value.equals("")) {
+                                                                      if(Double.valueOf(event.value.replaceAll(",", ".")) > 0){
+                                                                        self.style="font-weight:bold";
+                                                                        bonCommandeWin.calculerPrixDeduitForCurrentLigne(self.parent.parent.value, Double.valueOf(event.value.replaceAll(",", ".")));
+                                                                      }
+                                                                      else self.constraint="no negative, no zero:Veuillez indiquez une valeur strictement positive";
+                                                                    }
+                                                                ]]>
+                                                            </attribute>
+                                                            <attribute name="onChange,onOK">
+                                                                <![CDATA[
+                                                                    if(self.value != null && (self.value.equals("") || Double.valueOf(event.value.replaceAll(",", ".")) < 0)){ 
+                                                                        self.focus = true;
+                                                                        else {
+                                                                            bonCommandeWin.updateLigneProduit();
+                                                                        }
+                                                                    }
+                                                                ]]>
+                                                            </attribute>
+                                                            
+                                                        </doublebox>   
+                                                    </listcell>	
+                                                    <listcell label="@{lignepdt.produit.prixAchat, converter='com.choranet.zk.DoubleConverter'}" />
+                                                    <listcell>
+                                                        <doublebox value="@{lignepdt.prixDeduit, save-when='self.onChange'}" constraint="no negative,no empty:Veuillez indiquez une valeur positive" format="#,##0.##" inplace="true" onChange='self.style="font-weight:bold"; bonCommandeWin.updateLigneProduit();' onOK='self.style="font-weight:bold"; bonCommandeWin.updateLigneProduit();' width="99%" >
+                                                            <attribute name="onChanging">
+                                                                <![CDATA[
+                                                                    if(event.value != null && !event.value.equals("")) {
+                                                                        bonCommandeWin.updateLigneProduit();
+                                                                    }
+                                                                ]]>
+                                                            </attribute>
+                                                        </doublebox>
+                                                    </listcell>
+                                                    <listcell>
+                                                        <doublebox value="@{lignepdt.trans_sousTotal}" readonly="true" format="#,##0.##" inplace="true"  width="99%" />
+                                                    </listcell>
+                                                </listitem>
+                                            </listbox>
+                                            <separator/>
+                                            <grid id="gridAjout" span="true" sizedByContent="true" visible="false">
+                                                <columns>
+                                                    <column width="32px" />
+                                                    <column width="70px" />
+                                                    <column width="300px" />
+                                                    <column width="70px" />
+                                                    <column width="70px"/>
+                                                    <column width="90px" />
+                                                    <column width="90px" />
+                                                </columns>
+                                                <rows>
+                                                    <row>
+                                                        <image src="/images/skin/database_edit.png"  />
+                                                        <intbox id="fieldsequenceLignebis" format="#,##0" value="@{bonCommandeWin.ligneProduit.sequenceLigne, save-when='self.onChange'}" onOK="bonCommandeWin.addLigneProduit();informationsporduit.close();" inplace="true" width="99%" />
+                                                        <combobox id="conewproduits" constraint="no empty : Veuillez choisir un produit" model="@{bonCommandeWin.produits}" selectedItem="@{bonCommandeWin.ligneProduit.produit}" 
+                                                                  onChange='bonCommandeWin.calculerPrixDeduit(); bonCommandeWin.calculerQuantiteProduitEnStock();informationsporduit.open(self, "after_start")' 
+                                                                  onOK="bonCommandeWin.addLigneProduit();informationsporduit.close();self.focus();" inplace="true" width="99%">
+                                                            <comboitem self="@{each=elementnewproduit}" label="@{elementnewproduit}"/>
+                                                        </combobox>
+                                                        <doublebox id="fieldquantitebis" format="#,##0.##" constraint="no negative,no empty:Veuillez indiquez une valeur positive" value="@{bonCommandeWin.ligneProduit.quantite, save-when='self.onChange'}" onOK="bonCommandeWin.addLigneProduit();informationsporduit.close();conewproduits.focus();" inplace="true" width="99%">
+<!--                                                            <attribute name="onChanging">
+                                                                <![CDATA[
+                                                                    if(event.value != null && !event.value.equals("")) {
+                                                                        bonCommandeWin.calculerPrixDeduit();
+                                                                        fieldsoustotal.value = fieldprixDeduitbis.value * (1 - fieldremisebis.value / 100) * Double.valueOf(event.value.replaceAll(",", "."));
+                                                                        bonCommandeWin.calculerPrixDeduit();
+                                                                    } 
+                                                                ]]>
+                                                            </attribute>-->
+                                                            <attribute name="onChanging">
+                                                                <![CDATA[
+                                                                    if(event.value != null && !event.value.equals("")) {
+                                                                        bonCommandeWin.ligneProduit.quantite = Double.valueOf(event.value.replaceAll(",", "."));
+                                                                        bonCommandeWin.calculerPrixDeduit();
+                                                                        //fieldsoustotal.value = fieldprixDeduitbis.value * (1 - fieldremisebis.value / 100) * Double.valueOf(event.value.replaceAll(",", "."));
+                                                                        //bonCommandeWin.calculerPrixDeduit();
+                                                                    } 
+                                                                ]]>
+                                                            </attribute>
+                                                        </doublebox>
+                                                        <label id="fieldprixbis" value="@{bonCommandeWin.ligneProduit.produit.prixAchat, converter='com.choranet.zk.DoubleConverter'}" width="99%" />
+                                                        <doublebox id="fieldprixDeduitbis" constraint="no negative:Veuillez indiquez une valeur positive" format="#,##0.##" value="@{bonCommandeWin.ligneProduit.prixDeduit, save-when='self.onChange'}" inplace="true" width="99%">
+                                                            <attribute name="onOK">
+                                                                <![CDATA[
+                                                                    if(self.value != null){
+                                                                      bonCommandeWin.addLigneProduit();informationsporduit.close();
+                                                                    }
+                                                                    conewproduits.focus();
+                                                                ]]>
+                                                            </attribute>
+                                                            <attribute name="onChanging">
+                                                                <![CDATA[
+                                                                    if(event.value != null && !event.value.equals(""))
+                                                                    fieldsoustotal.value = Double.valueOf(event.value.replaceAll(",", ".")) * (1 - fieldremisebis.value / 100) * fieldquantitebis.value;
+                                                                ]]>
+                                                            </attribute>
+                                                        </doublebox>
+                                                        <doublebox id="fieldsoustotal" format="#,##0.##" value="@{bonCommandeWin.ligneProduit.trans_sousTotal}" readonly="true" width="99%"/>
+                                                    </row>
+                                                </rows>
+                                            </grid>
+                                        </vbox>
+                                    </tabpanel>
+                                </tabpanels>
+                            </tabbox>
+                            <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));bonCommandeWin.add();conewproduits.clearErrorMessage();conewproduits.focus();" label="Sauveguarder" image="/images/skin/database_save.png" visible="false"/>
+                            <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));bonCommandeWin.update();conewproduits.clearErrorMessage();conewproduits.focus();" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                            <button id="btnValider" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));bonCommandeWin.validerBp();" label="Confirmer" image="/images/skin/confirmer.png" visible="false" if="${estBP}"/>
+                            <button id="btnDocument" label="Imprimer" image="/images/skin/printer_small.png" visible="false" onClick="bonCommandeWin.doModalDialogChoix()" />
+                            <button id="btnDelete" label="Supprimer" image="/images/skin/database_delete.png" visible="false">
+                                <attribute name="onClick">
+                                    <![CDATA[
+                                    Messagebox.show("Etes vous sûr de vouloir continuer ?", "Confirmation", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+                                        public void onEvent(Event evt) throws InterruptedException {
+                                            if (evt.getName().equals("onOK")) {
+                                                Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));
+                                                bonCommandeWin.delete();
+                                            } 
+                                        }
+                                    });
+                                    ]]>
+                                </attribute>    
+                            </button>
+                            <button id="btnCancel" onClick="bonCommandeWin.cancel()" label="Annuler" image="/images/skin/cancel.png" />
+                            <button id="btnList" onClick="bonCommandeWin.fermer()" label="Retour à la liste" image="/images/skin/database_table.png" />
+                            <button id="btnPdt" label="Produits" image="/images/skin/BriefcaseSpark-16x16.png" visible="true" onClick="bonCommandeWin.doModalDialogPdt()" />
+                            <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                        </groupbox>
+                    </center>
+                </borderlayout>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="bonCommandeWin.select()" model="@{bonCommandeWin.listeObjets}" selectedItem="@{bonCommandeWin.objetSelected}"  width="100%" height="100%" mold="paging" paginal="${paging}" >
+                        <auxhead sclass="category-center">
+                            <auxheader colspan="1"/>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterNumBC" value="@{bonCommandeWin.filtre.numBC}" onChanging="bonCommandeWin.ofs; bonCommandeWin.filtre.numBC=event.value; bonCommandeWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <datebox id="filterDate" format="dd/MM/yyyy" value="@{bonCommandeWin.filtre.date}" onOK="bonCommandeWin.ofs=0; bonCommandeWin.filtrer(); self.focus();" width="90%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <combobox id="filterLivree" readonly="true" onOK="bonCommandeWin.ofs=0;bonCommandeWin.filtrer();"  width="90%">
+                                    <attribute name="onCreate">
+                                        <![CDATA[
+                                            List l = new ArrayList();
+                                            l.add("Oui/Non");
+                                            l.add("Oui");
+                                            l.add("Non");
+                                            ListModelList lm = new ListModelList(l);
+                                            lm.addSelection(lm.get(0));
+                                            self.setModel(lm);
+                                        ]]>
+                                    </attribute>
+                                    <attribute name="onChange">
+                                        <![CDATA[
+                                            if(self.selectedIndex == 0) {
+                                                bonCommandeWin.filtre.livree = null;
+                                            } else if(self.selectedIndex == 1) {
+                                                bonCommandeWin.filtre.livree = true;
+                                            } else {
+                                                bonCommandeWin.filtre.livree = false;
+                                            }
+                                        ]]>
+                                    </attribute>
+                                </combobox>                                
+                            </auxheader>
+                            <auxheader />
+                        </auxhead>
+                        <listhead sizable="true">
+                            <listheader width="32px" />
+                            <listheader id="hnumBC" label="Numéro système" sort="auto(numBC)" onSort="bonCommandeWin.sort(event)"/>	
+                            <listheader id="hdate" label="Date" sort="auto(date)" onSort="bonCommandeWin.sort(event)"/>	
+                            <listheader label="Livré?"/>	
+                            <listheader label="Montant" sort="auto(date)" onSort="bonCommandeWin.sort(event)"/>	
+                        </listhead>
+                        <listitem value="@{element}" self="@{each=element}">    
+                            <listcell image="/images/skin/icon_selection.png"/>
+                            <listcell label="@{element.numBC}" />
+                            <listcell>
+                                <datebox format="dd/MM/yyyy" value="@{element.date, save-when='self.onChange'}" inplace="true" onOK="bonCommandeWin.objet=self.parent.parent.value; bonCommandeWin.update();" onChange='self.style="font-weight:bold"' width="99%"/>
+                            </listcell>	
+                            <listcell label="@{element.livree, converter='com.choranet.zk.TrueFalseConverter'}" />
+                            <listcell label="@{element.trans_totalttc, converter='com.choranet.zk.DoubleConverter'}" />
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{bonCommandeWin.tailleListe}" pageSize="@{bonCommandeWin.maxNb}" onPaging="bonCommandeWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="bonCommandeWin.newRecord();" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="bonCommandeWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="bonCommandeWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+        <window id="modalDialogChoix" title="Générer document" border="normal" width="460px"
+                closable="true" action="show: slideDown;hide: slideUp" position="center,center" visible = "false" onClose="self.visible = false; event.stopPropagation();">
+            <vlayout>
+                <div>
+                    <radiogroup id="sv1" />
+                    <radio id="rdefaut" label="Par défaut" radiogroup="sv1" />
+                    <radio id="ravecEntetepied" label="Avec entête et pied" radiogroup="sv1" />
+                    <radio id="rsansEntetepied" label="Sans entête et pied" radiogroup="sv1" />
+                </div>
+                <separator/>
+                <checkbox id="AvecCachet" label="Avec cachet" />
+                <checkbox id="AvecCopie" label="Avec message copie" />
+                <checkbox id="AvecDestinataire" label="Avec destinataire" value=" " >
+                    <attribute name="onCheck">
+                        <![CDATA[
+
+                        if(AvecDestinataire.checked) {
+                        fieldDestinataire.visible = true;
+                        }
+                        else{
+                        fieldDestinataire.visible = false;
+                        fieldDestinataire.constraint="";
+                        }
+                        ]]>
+                    </attribute>
+                </checkbox>
+                <textbox id="fieldDestinataire" hflex = "1" visible = 'false'/>
+                <button hflex="1" label="Générer" onClick='bonCommandeWin.genererDocument(rdefaut.selected,ravecEntetepied.selected,rsansEntetepied.selected, AvecCachet.checked, AvecCopie.checked, AvecDestinataire.checked, fieldDestinataire.value)'/> 
+            </vlayout>
+        </window>
+        <window id="winProduit" title="Gestion produits" border="normal" width="850px" height="100%"
+                closable="true" action="show: slideDown;hide: slideUp" position="center,center" visible = "false" onClose="self.visible = false; event.stopPropagation();">
+            <groupbox width="100%" height="100%">
+                <listbox id="lstProduitRecherche" model="@{bonCommandeWin.produitsRecherche}" selectedItem="@{bonCommandeWin.produitRechercheSelected}"  width="800px" height="350px" rows="9">
+                    <auxhead sclass="category-center">
+                        <auxheader colspan="1"/>
+                        <auxheader colspan="1">
+                            <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                            <combobox id="cocatpdtrechreche" model="@{bonCommandeWin.categoriesProduitRecherche}" selectedItem="@{bonCommandeWin.categorieRecherche}" autocomplete="true" autodrop="true" mold="rounded" onSelect="bonCommandeWin.rechercher()" onOK=";bonCommandeWin.rechercher()" width="90%">
+                                <comboitem self="@{each=elementcatpdt}" label="@{elementcatpdt}"/>
+                            </combobox>
+                        </auxheader>
+                        <auxheader colspan="1">
+                            <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                            <textbox id="filterPdtCode" value="@{bonCommandeWin.codeRecherche}" onChanging="bonCommandeWin.codeRecherche=event.value; bonCommandeWin.rechercher(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="90%"/>
+                        </auxheader>
+                        <auxheader colspan="1">
+                            <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                            <textbox id="filterPdtDesignation" value="@{bonCommandeWin.designationRecherche}" onChanging="bonCommandeWin.designationRecherche=event.value; bonCommandeWin.rechercher(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="90%"/>
+                        </auxheader>
+                    </auxhead>
+                    <listhead sizable="true">
+                        <listheader width="32px" />
+                        <listheader label="Catégorie" sort="auto(categorieProduit)"/>	
+                        <listheader label="Code" sort="auto(code)"/>	
+                        <listheader label="Désignation" sort="auto(designation)"/>	
+                    </listhead>
+                    <listitem value="@{elementpdt}" self="@{each=elementpdt}">    
+                        <listcell image="/images/skin/icon_selection.png"/>
+                        <listcell label="@{elementpdt.categorieProduit.intitule}" />
+                        <listcell label="@{elementpdt.code}" />
+                        <listcell label="@{elementpdt.designation}" />
+                    </listitem>
+                </listbox>
+<!--                    <paging id="paging" totalSize="@{bonCommandeWin.tailleListe}" pageSize="@{bonCommandeWin.maxNb}" onPaging="bonCommandeWin.getNextElements(event);" />-->
+                <separator/>
+                <button id="btnUtiliserPdt" label="Utiliser produit sélectioné" image="/images/skin/ArrowRightGreen-16x16.png" onClick="bonCommandeWin.utiliserProduitRecherche()" />                
+            </groupbox>
+        </window>
+    </window>
+</zk>

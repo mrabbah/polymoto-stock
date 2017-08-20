@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : zk.xml
+    Created on : 22 juin 2011, 11:52
+    Author     : RABBAH
+    Description:
+        Purpose of the document follows.
+-->
+<zk>
+    <listener>
+        <description>Hibernate thread session context handler
+        </description>
+        <listener-class>
+            org.zkoss.zkplus.spring.SpringTransactionSynchronizationListener
+        </listener-class>
+    </listener>
+    
+    <session-config>
+        <session-timeout>1800</session-timeout>
+        <device-type>ajax</device-type>    
+        <timeout-uri>/logout</timeout-uri> 
+        <timer-keep-alive>false</timer-keep-alive>
+        <max-desktops-per-session>15</max-desktops-per-session>
+        <max-requests-per-session>5</max-requests-per-session>
+        <max-pushes-per-session>3</max-pushes-per-session>
+    </session-config>
+    
+    <library-property>
+        <name>org.zkoss.zul.chart.engine.class</name>
+        <value>org.zkoss.zkex.zul.impl.JFreeChartEngine</value>
+    </library-property>
+    
+    <system-config>
+        <max-upload-size>-1</max-upload-size>
+    </system-config>
+    
+<!--    
+<listener>
+        <description>Hibernate Open Session In View life-cycle</description>
+        <listener-class>org.zkoss.zkplus.hibernate.OpenSessionInViewListener</listener-class>
+    </listener>
+<listener> 
+        <description>ThreadLocal Variables Synchronizer</description> 
+        <listener-class>org.zkoss.zkplus.util.ThreadLocalListener</listener-class>
+    </listener>
+  
+    <preference> 
+        <name>ThreadLocal</name> 
+        <value>
+            org.springframework.transaction.support.TransactionSynchronizationManager=
+            resources,synchronizations,currentTransactionName,currentTransactionReadOnly,actualTransactionActive; 
+            org.springframework.orm.hibernate3.SessionFactoryUtils=deferredCloseHolder; 
+            org.springframework.transaction.interceptor.TransactionAspectSupport=transactionInfoHolder; 
+        </value>
+    </preference>-->  
+</zk>

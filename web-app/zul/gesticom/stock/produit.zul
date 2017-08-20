@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./produitWin" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="produitWin" height="100%" width="100%" style="margin:auto;" use="${produitWindow}">
+    <!-- <zscript src="/zs/produit.zs"/> -->
+        <borderlayout>
+            <north id="eastPanel" size="65px" open="false"  title="Recherche avancée" flex="true" splittable="true"  collapsible="true"  >
+                <hlayout spacing="10px" style="margin-top:9px;margin-left:10px">
+                    <label value="Entrepôt:" />
+                    <combobox id="filterempReception" model="@{produitWin.empReceptions}" selectedItem="@{produitWin.filtre.empReception}" autocomplete="true" autodrop="true" mold="rounded" onSelect="produitWin.ofs=0;produitWin.filtrer()" onOK="produitWin.ofs=0;produitWin.filtrer()">
+                        <comboitem self="@{each=elementfiltreempReception}" label="@{elementfiltreempReception}"/>
+                    </combobox>
+                    <label value="Catégorie :" />
+                    <combobox id="filtercategorieProduit" model="@{produitWin.categorieProduits}" selectedItem="@{produitWin.filtre.categorieProduit}" autocomplete="true" autodrop="true" mold="rounded" onSelect="produitWin.ofs=0;produitWin.filtrer()" onOK="produitWin.ofs=0;produitWin.filtrer()">
+                        <comboitem self="@{each=elementfiltrecategorieProduit}" label="@{elementfiltrecategorieProduit}"/>
+                    </combobox>                    
+                </hlayout>
+            </north>
+            <west id="westPanel" title="Gestion des produits" size="40%" flex="true" splittable="true" collapsible="true" open="false">
+                <groupbox id="gbCrud" width="100%" height="100%">
+                    <tabbox width="100%" height="100%" mold="accordion-lite">
+                        <tabs>
+                            <tab label="Informations Produit" />                            
+                        </tabs>
+                        <tabpanels>
+                            <tabpanel>
+                                <grid fixedLayout="true">
+                                    <rows>
+                                        <row>
+                                            <label value="Code"/>
+                                            <textbox id="fieldCode" constraint="no empty: Veillez indiquez une valeur" value="@{produitWin.objet.code, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");' width="99%"/>
+                                        </row>												                                        												
+                                        <row>
+                                            <label value="Désignation"/>
+                                            <textbox id="fieldDesignation" constraint="no empty: Veillez indiquez une valeur" value="@{produitWin.objet.designation, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");' width="99%"/>
+                                        </row>												
+                                        <row>
+                                            <label value="Conditionnement"/>
+                                            <textbox id="fieldConditionnement"  value="@{produitWin.objet.conditionnement, save-when='triggerBtn.onClick'}"  width="99%"/>
+                                        </row>												
+                                        <row>
+                                            <label value="Prix d'achat"/>
+                                            <doublebox id="fieldPrixAchat" constraint="no empty, no negative: Veillez indiquez une valeur valide" value="@{produitWin.objet.prixAchat, save-when='triggerBtn.onClick'}" onBindingSave='if(self.value == null)throw new WrongValueException(self, "Vous devriez indiquer une valeur");' width="99%"/>
+                                        </row>			                                        											
+                                        <row>
+                                            <label value="Emplacement de réception" />
+                                            <combobox id="coempReceptions" model="@{produitWin.empReceptions}" selectedItem="@{produitWin.empReceptionSelected}" width="99%">
+                                                <comboitem self="@{each=elementempReception}" label="@{elementempReception}"/>
+                                            </combobox>
+                                        </row>                                        
+                                        <row>
+                                            <label value="Catégorie" />
+                                            <combobox id="cocategorieProduits" model="@{produitWin.categorieProduits}" selectedItem="@{produitWin.categorieProduitSelected}" constraint="no empty: Veillez choisir une valeur" width="99%">
+                                                <comboitem self="@{each=elementcategorieProduit}" label="@{elementcategorieProduit}"/>
+                                            </combobox>
+                                        </row>
+                                        <row>
+                                            <label value="Est Périssable"/>
+                                            <checkbox id="fieldPerissable" label="?" checked="@{produitWin.objet.perissable, save-when='triggerBtn.onClick'}"/>
+                                        </row>
+                                    </rows>
+                                </grid>	
+                            </tabpanel>                            
+                        </tabpanels>
+                    </tabbox>			
+                    <separator />
+                    <button id="btnSave" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));produitWin.add()" label="Sauveguarder" image="/images/skin/database_save.png"/>
+                    <button id="btnUpdate" onClick="Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));produitWin.update()" label="Modifier" image="/images/skin/database_edit.png" visible="false"/>
+                    <button id="btnDelete" label="Supprimer" image="/images/skin/database_delete.png" visible="false">
+                        <attribute name="onClick">
+                                    <![CDATA[
+                                    Messagebox.show("Etes vous sûr de vouloir continuer ?", "Confirmation", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, new org.zkoss.zk.ui.event.EventListener() {
+                                        public void onEvent(Event evt) throws InterruptedException {
+                                            if (evt.getName().equals("onOK")) {
+                                                Events.sendEvent(new Event(Events.ON_CLICK,triggerBtn));
+                                                produitWin.delete();
+                                            } 
+                                        }
+                                    });
+                                    ]]>
+                        </attribute>    
+                    </button>
+                    <!-- <button id="btnNew" onClick="produitWin.newRecord()" label="Nouveau enregistrement" image="/images/skin/database_add.png"/> -->
+                    <button id="btnCancel" onClick="produitWin.cancel()" label="Annuler" image="/images/skin/cancel.png"/>
+                    <button visible="false" id="triggerBtn" onBindingValidate=""/>
+                </groupbox>
+            </west>
+            <center border="none" flex="true">
+                <groupbox width="100%" height="100%">
+                    <listbox id="lstObjet" onSelect="produitWin.select()" model="@{produitWin.listeObjets}" selectedItem="@{produitWin.objetSelected}"  width="99%" height="490px" mold="paging" paginal="${paging}">
+                        <auxhead sclass="category-center">
+                            <auxheader colspan="1"/>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterCode" value="@{produitWin.filtre.code}" onChanging="produitWin.ofs; produitWin.filtre.code=event.value; produitWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterDesignation" value="@{produitWin.filtre.designation}" onChanging="produitWin.ofs; produitWin.filtre.designation=event.value; produitWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <textbox id="filterConditionnement" value="@{produitWin.filtre.conditionnement}" onChanging="produitWin.ofs; produitWin.filtre.conditionnement=event.value; produitWin.filtrer(); self.focus(); self.setSelectionRange(self.value.length(), self.value.length())" width="100%"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <doublebox id="filterPrixAchat" value="@{produitWin.filtre.prixAchat}" width="100%">
+                                    <attribute name="onChanging">
+                                        <![CDATA[
+                                                produitWin.ofs=0;
+                                                if(event.value.equals("")) {
+                                                        if(produitWin.filtre.prixAchat != null) {
+                                                                produitWin.filtre.prixAchat = null;
+                                                        }
+                                                } else {
+                                                        produitWin.filtre.prixAchat=new Double(event.value);
+                                                }
+                                                produitWin.filtrer();
+                                                self.focus();
+                                                if(!event.value.equals("")) {
+                                                        self.setSelectionRange(self.value.toString().length(), self.value.toString().length());
+                                                }
+                                        ]]>
+                                    </attribute>    
+                                </doublebox>
+                            </auxheader>                            
+                            <auxheader colspan="1">
+                                <image src="/images/skin/funnel.png" width="10px" height="10px" />
+                                <combobox id="filterPerissable" readonly="true" onOK="produitWin.ofs=0;produitWin.filtrer();" width="71px">
+                                    <attribute name="onCreate">
+                                        <![CDATA[
+                                            List l = new ArrayList();
+                                            l.add("Oui/Non");
+                                            l.add("Oui");
+                                            l.add("Non");
+                                            ListModelList lm = new ListModelList(l);
+                                            lm.addSelection(lm.get(0));
+                                            self.setModel(lm);
+                                        ]]>
+                                    </attribute>
+                                    <attribute name="onChange">
+                                        <![CDATA[
+                                            if(self.selectedIndex == 0) {
+                                                produitWin.filtre.perissable = null;
+                                            } else if(self.selectedIndex == 1) {
+                                                produitWin.filtre.perissable = true;
+                                            } else {
+                                                produitWin.filtre.perissable = false;
+                                            }
+                                        ]]>
+                                    </attribute>
+                                </combobox>                                
+                            </auxheader>
+                        </auxhead>
+                        <listhead sizable="true">
+                            <listheader width="32px" />
+                            <listheader label="Code" sort="auto(code)" onSort="produitWin.sort(event)"/>	
+                            <listheader label="Désignation" sort="auto(designation)" onSort="produitWin.sort(event)"/>	
+                            <listheader label="Conditionnement" sort="auto(conditionnement)" onSort="produitWin.sort(event)"/>	
+                            <listheader label="Prix d'achat" sort="auto(prixAchat)" onSort="produitWin.sort(event)"/>								
+                            <listheader label="Perissable?" sort="auto(perissable)" onSort="produitWin.sort(event)" width="105px"/>
+                        </listhead>
+                        <listitem value="@{element}" self="@{each=element}">    
+                            <listcell image="/images/skin/icon_selection.png"/>
+                            <listcell>
+                                <textbox value="@{element.code, save-when='self.onChange'}" inplace="true" onOK="produitWin.objet=self.parent.parent.value; produitWin.update();" onChange='self.style="font-weight:bold"' width="99%"/>
+                            </listcell>							
+                            <listcell>
+                                <textbox value="@{element.designation, save-when='self.onChange'}" inplace="true" onOK="produitWin.objet=self.parent.parent.value; produitWin.update();" onChange='self.style="font-weight:bold"' width="99%"/>
+                            </listcell>							
+                            <listcell>
+                                <textbox value="@{element.conditionnement, save-when='self.onChange'}" inplace="true" onOK="produitWin.objet=self.parent.parent.value; produitWin.update();" onChange='self.style="font-weight:bold"' width="99%"/>
+                            </listcell>							
+                            <listcell>
+                                <doublebox value="@{element.prixAchat, save-when='self.onChange'}" inplace="true" onOK="produitWin.objet=self.parent.parent.value; produitWin.update();" onChange='self.style="font-weight:bold"' width="99%" />
+                            </listcell>		
+                            <listcell>
+                                <combobox inplace="true" readonly="true">
+                                    <attribute name="onOK">
+                                        <![CDATA[
+                                            if(self.selectedIndex == 0) {
+                                                self.parent.parent.value.perissable = true;
+                                            } else {
+                                                self.parent.parent.value.perissable = false;
+                                            }
+                                            produitWin.objet=self.parent.parent.value; 
+                                            produitWin.update();
+                                        ]]>
+                                    </attribute>
+                                    <attribute name="onCreate">
+                                        <![CDATA[
+                                            List l = new ArrayList();
+                                            l.add("Oui");
+                                            l.add("Non");
+                                            ListModelList lm = new ListModelList(l);
+                                            self.setModel(lm);
+                                        ]]>
+                                    </attribute>
+                                    <attribute name="onAfterRender">
+                                        <![CDATA[
+                                            if(self.parent.parent.value.perissable == true) {
+                                                self.selectedIndex = 0;
+                                            } else {
+                                                self.selectedIndex = 1;
+                                            }
+                                        ]]>
+                                    </attribute>
+                                </combobox>
+                            </listcell>	
+                        </listitem>
+                    </listbox>
+                    <paging id="paging" totalSize="@{produitWin.tailleListe}" pageSize="@{produitWin.maxNb}" onPaging="produitWin.getNextElements(event);" />
+                    <separator/>
+                    <button id="btnNew" onClick="produitWin.newRecord()" label="Nouveau" image="/images/skin/database_add.png"/>
+                    <button id="btnPdf" onClick="produitWin.genererRapportPdf()" label="Generer rapport" image="/images/skin/pdf-soubor-logo.png"/>
+                    <button id="btnExcel" onClick="produitWin.genererRapportExcel()" label="Generer excel" image="/images/skin/excel-icon.png"/>
+                    <fileupload id="btnImport" label="Import en masse" onUpload="produitWin.importation(event.getMedia())" image="/images/skin/BriefcaseOpen-16x16.png"/>
+                </groupbox>
+            </center>
+        </borderlayout>
+    </window>
+</zk>
